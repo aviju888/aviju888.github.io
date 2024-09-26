@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS180 Project #1</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: #ffffff;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #007bff;
+        }
+
+        header h3 {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        header p {
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            color: #007bff;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .section {
+            margin-bottom: 50px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .image-gallery div {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .description {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        pre {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CS180: Project #1</h1>
+        <h3>by Adriel Vijuan</h3>
+        <p>Colorizing the <a href="https://www.loc.gov/collections/prokudin-gorskii/">Prokudin-Gorskii Photo Collection</a>.</p>
+    </header>
+
+    <main>
+        <!-- PROJECT OVERVIEW -->
+        <section class="section" style="display: flex; align-items: flex-start;">
+            <div style="flex: 1; margin-right: 20px;">
+                <h2>Project Overview</h2>
+                <p>This project focuses on colorizing the Prokudin-Gorskii photo collection by aligning the color channels of historical 
+                    black-and-white images. The original black-and-white images consist of film strips of three images, each taken of the same scene, but through a red, blue, 
+                    and green filter respectively.
+                    The approach I underwent combines these images into a colorized version and involves several key steps that will be broken down.</p>
+                <!-- <ul>
+                    <li><strong>Normalization:</strong> Normalizing pixel values to a common scale for consistency.</li>
+                    <li><strong>Splitting:</strong> Dividing each image into RGB channels.</li>
+                    <li><strong>Alignment:</strong> Aligning RGB channels using simple or pyramid-based methods for accuracy and efficiency.</li>
+                    <li><strong>White Balancing:</strong> Correcting color imbalances to achieve realistic color representation.</li>
+                </ul> -->
+            </div>
+
+            <div style="flex: 0 0 auto;">
+                <img src="data/cathedral.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
+            </div>
+            <div style="flex: 0 0 auto;"></div>
+                <img src="data/monastery.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
+            </div>
+            <div style="flex: 0 0 auto;"></div>
+                <img src="data/tobolsk.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
+            </div>
+        </section>
+
+        
+        <!-- APPROACH BREAKDOWN -->
+        <section class="section">
+            <h2>Approach Breakdown</h2>
+            
+            <h3>Configuration</h3>
+            <p>The configuration section of the code determines how image processing is handled based on user input:</p>
+            <ul>
+                <li><strong><code>PROCESS_SINGLE_IMAGE</code></strong>: This variable allows the user to specify whether to process a single image or multiple images within a 
+                    directory. If set to <code>True</code>, the program will process only one image that is specified. If set to <code>False</code>, the program will process 
+                    all images in a given directory. This configuration provides flexibility for different processing needs.</li>
+                <li><strong>File Types:</strong> The program is designed to handle various image file formats, as specified by a configurable list of acceptable file 
+                    extensions. This ensures that the processing can be applied to different types of image files, depending on the requirements.</li>
+            </ul>
+
+            <h3>Alignment Methods</h3>
+            <p><i>The alignment methods are tailored to handle images of different sizes:</i></p>
+
+            <h4>1. Smaller Images</h4>
+            <p>For smaller images, the alignment approach was sufficient using the L2 norm:</p>
+            <ul>
+                <li><strong>Search Range:</strong> A search range is defined to explore different shifts of the image.</li>
+                <li><strong>Shifting and Comparison:</strong> The algorithm shifts one image by various amounts within the defined search range and calculates the L2 norm, 
+                    which measures the difference between the shifted image and the reference image. The goal is to find the shift that results in the smallest L2 norm score, 
+                    indicating the best alignment.</li>
+                <li><strong>Optimal Shift:</strong> The shift that achieves the lowest L2 norm score is chosen as the optimal alignment. The image is then adjusted according 
+                    to this shift, ensuring the best possible alignment with the reference image.</li>
+            </ul>
+            
+            <h4>2. Larger Images</h4>
+            <p>For larger images, the alignment method is more advanced as the L2 approach could end up costly:</p>
+            <ul>
+                <li><strong>Cross-Correlation with FFT:</strong> To determine how well two images align, cross-correlation is used. This measures the similarity between the two 
+                    images as one is shifted over the other. Cross-correlation is performed by multiplying the FFT of the reference image with the conjugate 
+                    of the FFT of the image to be aligned and then taking the inverse FFT of the result. Even though it is mathematically equivalent to convolution in the 
+                    spatial domain it ended up being computationally more efficient.</li>
+                <li><strong>Gaussian Pyramid:</strong> A Gaussian pyramid is created to handle images at multiple scales. By processing images at various resolutions, the 
+                    alignment can be refined from coarse to fine scales. This method improves accuracy for large images.</li>
+                <li><strong>Pyramid Alignment:</strong> The alignment starts with the coarsest level of the pyramid and proceeds to finer levels. This multi-scale approach 
+                    helps in aligning large images, addressing both global and local alignment issues.</li>
+            </ul>
+
+            <h3>Processing Steps</h3>
+            <p>The processing stage consists of several key steps to prepare and finalize the colorized images:</p>
+            <ol>
+                <li><strong>Normalization:</strong> Pixel values of the images are standardized to ensure consistency. This step involves scaling pixel intensities so that 
+                    they are on a common scale, which is essential for accurate image alignment and colorization.</li>
+                <li><strong>Splitting Channels:</strong> The image is divided into its RGB (Red, Green, Blue) channels. Each channel is processed separately to facilitate 
+                    alignment and color adjustment.</li>
+                <li><strong>Aligning:</strong> Depending on the image size, the appropriate alignment method is applied. Smaller images use the L2 norm approach, while 
+                    larger images use cross-correlation with FFT and Gaussian pyramids.</li>
+                <li><strong>White Balancing:</strong> This step corrects color imbalances by setting the brightest color in the image to white. The colors are then scaled 
+                    based on this adjustment to ensure realistic color representation.</li>
+                <li><strong>Stacking and Saving:</strong> The aligned RGB channels are combined into a single color image. The final image is saved as a JPEG file, which
+                    helps manage file size, and is stored in the specified output directory.</li>
+            </ol>
+        </section>
+
+
+        <!-- RESULTS -->
+        <section class="section">
+            <h2>Results</h2>
+            <p>Results of the colorization process from the provided data folder for this project:</p>
+            
+            <div class="image-gallery" id="gallery">
+                <!-- Images will be dynamically added here -->
+            </div>
+        </section>
+
+        <!-- For loading images -->
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const gallery = document.getElementById('gallery');
+                const imageDirectory = 'output/';
+                const imageFiles = [
+                    { name: 'cathedral.jpg', green: '[-5, 0]', red: '[-5, 1]' },
+                    { name: 'church.jpg', green: '[-25, 4]', red: '[-39, 5]' },
+                    { name: 'emir.jpg', green: '[-86, -7]', red: '[-80, -13]' },
+                    { name: 'harvesters.jpg', green: '[-48, 3]', red: '[-90, -5]' },
+                    { name: 'icon.jpg', green: '[-36, -4]', red: '[-67, -16]' },
+                    { name: 'lady.jpg', green: '[-33, 8]', red: '[-93, 13]' },
+                    { name: 'melons.jpg', green: '[-72, -2]', red: '[-132, -5]' },
+                    { name: 'monastery.jpg', green: '[-6, -1]', red: '[-7, -1]' },
+                    { name: 'onion_church.jpg', green: '[-43, -8]', red: '[-81, -27]' },
+                    { name: 'sculpture.jpg', green: '[-81, 12]', red: '[-105, 20]' },
+                    { name: 'self_portrait.jpg', green: '[-74, -6]', red: '[-98, 4]' },
+                    { name: 'three_generations.jpg', green: '[-43, 0]', red: '[-81, -5]' },
+                    { name: 'tobolsk.jpg', green: '[-3, -1]', red: '[-5, -3]' },
+                    { name: 'train.jpg', green: '[-84, 0]', red: '[-81, -1]' }
+                ];
+
+                imageFiles.forEach(file => {
+                    const div = document.createElement('div');
+                    const img = document.createElement('img');
+                    const p = document.createElement('p');
+                    
+                    img.src = `${imageDirectory}${file.name}`;
+                    img.alt = file.name;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    
+                    p.className = 'description';
+                    p.textContent = `Displacement vectors for ${file.name}: Green channel: ${file.green}, Red channel: ${file.red}`;
+                    
+                    div.appendChild(img);
+                    div.appendChild(p);
+                    gallery.appendChild(div);
+                });
+            });
+        </script>
+
+        <!-- CSS for Grid -->
+        <style>
+            .image-gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 10px;
+            }
+            .image-gallery img {
+                width: 100%;
+                height: auto;
+            }
+            .description {
+                text-align: center;
+                font-size: 0.9em;
+                color: #555;
+            }
+        </style>
+
+        <!-- COMMENTARY -->
+<section class="section" style="display: flex; align-items: flex-start;">
+    <div style="flex: 1; margin-right: 20px;">
+        <h2>Bells and Whistles</h2>
+        
+        <p><strong>White Balance:</strong> In this project, a white balance function was implemented to correct color 
+            imbalances in the images -- thereby improving image quality overall. The function, <code>white_balance_white</code>, is based on a 
+            method discussed in lecture, which assumes that the brightest pixel in the image represents white.</p>
+
+        <ul>
+            <li>The function determines the maximum intensity values for each color channel (red, green, 
+                blue) in the image.</li>
+            <li>It calculates scaling factors by finding the inverse of these maximum values. This helps ensure that the 
+                brightest pixel in each channel is scaled to white.</li>
+            <li>These scaling factors are applied to the respective color channels to adjust the intensities. The 
+                image values are then clipped to ensure they stay within the valid range [0, 1].</li>
+        </ul>
+    </div>
+
+    <!-- Image container -->
+    <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;">
+        <div>
+            <p><strong>Before:</strong></p>
+            <img src="output/icon-messed-up.jpg" alt="Cathedral Before" style="max-width: 200px; height: 200px; display: block; margin-bottom: 10px;">
+        </div>
+        <div>
+            <p><strong>After:</strong></p>
+            <img src="output/icon.jpg" alt="Cathedral After" style="max-width: 200px; height: 200px; display: block;">
+        </div>
+    </div>
+</section>
+
+        
+        <!-- CUSTOM RESULTS -->
+        <section class="section">
+            <h2>Custom Results</h2>
+            <p>Results of additional colorization processes, beyond the provided data for the project:</p>
+            
+            <div class="image-gallery" id="custom-gallery">
+                <!-- Images will be dynamically added here -->
+            </div>
+        </section>
+
+        <!-- For loading images -->
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const customGallery = document.getElementById('custom-gallery');
+                const imageDirectory = 'output/';
+                const customImageFiles = [
+                    { name: 'custom-1.jpg', green: '[-68, 6]', red: '[-74, 10]' },
+                    { name: 'custom-2.jpg', green: '[-66, -15]', red: '[-55, -10]' },
+                    { name: 'custom-3.jpg', green: '[-40, 9]', red: '[-61, 16]' },
+                    { name: 'custom-4.jpg', green: '[2, 1]', red: '[-2, 2]' }
+                ];
+
+                customImageFiles.forEach(file => {
+                    const div = document.createElement('div');
+                    const img = document.createElement('img');
+                    const p = document.createElement('p');
+                    
+                    img.src = `${imageDirectory}${file.name}`;
+                    img.alt = file.name;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    
+                    p.className = 'description';
+                    p.textContent = `Displacement vectors: Green channel: ${file.green}, Red channel: ${file.red}`;
+                    
+                    div.appendChild(img);
+                    div.appendChild(p);
+                    customGallery.appendChild(div);
+                });
+            });
+        </script>
+
+    <!-- COMMENTARY -->
+    <section class="section">
+        <h2>Commentary</h2>
+        
+        <p>While many images have been successfully colorized, some show misalignment issues that need to be addressed. 
+            For instance, discrepancies in alignment can be observed due to the scoring mechanism used, which did not 
+            fully account for the varying contrast levels of the RGB channels. This contrast difference affects the 
+            scoring during the pyramid alignment process.</p>
+        
+        <p>One notable example is the image <strong>emir.tif</strong>, where the alignment is close but not perfect. The 
+            patterns and textures in the outfit of the subject cause the displacement vectors to shift slightly, 
+            resulting in a misalignment of the color layers. This issue arises, as I believe, due to the fact that 
+            the alignment algorithm struggles with contrasting patterns, which complicates achieving precise alignment.</p>
+        
+    </section>
+
+    </main>
+</body>
+</html>
