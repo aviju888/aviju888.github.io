@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS180 Project #2</title>
+    <!-- Include MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: #ffffff;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #007bff;
+        }
+
+        header h3 {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        header p {
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            color: #007bff;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .section {
+            margin-bottom: 50px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .image-gallery div {
+            flex: 1 1 calc(33.333% - 40px); /* Three per row with gaps */
+            box-sizing: border-box;
+            max-width: 400px; /* Adjust as needed */
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .image-gallery div {
+                flex: 1 1 calc(50% - 40px); /* Two per row on medium screens */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .image-gallery div {
+                flex: 1 1 100%; /* One per row on small screens */
+            }
+        }
+
+        .description {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* Optional: Center MathJax display equations */
+        .MathJax_Display {
+            text-align: center;
+            margin: 1em 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CS180: Project #2</h1>
+        <h3>by Adriel Vijuan</h3>
+        <p>Fun with Filters and Frequencies</p>
+    </header>
+
+    <main>
+        <!-- INTRODUCTION -->
+        <section class="section">
+            <h2>Introduction</h2>
+            <p>In this project, I explored various image processing techniques, including finite difference operators,
+                 derivative of Gaussian (DoG) filters, image sharpening, hybrid images, and multiresolution blending using 
+                 Gaussian and Laplacian stacks. These techniques were applied to several images, such as the Cameraman, 
+                 Apple, Orange, and some custom images, to analyze their effects on edge detection, frequency domain 
+                 manipulation, and image blending. The following sections provide a detailed report of the methods and
+                  results.</p>
+        </section>
+
+        <!-- 1: FUN WITH FILTERS -->
+        <section class="section">
+            <h2>Part 1: Fun with Filters</h2>
+
+            <!-- Section 1.1 -->
+            <h3>1.1 Finite Difference Operator</h3>
+            <p>In this part, I used finite difference operators to approximate the gradients in the x and y directions 
+                of the image, detecting edges based on changes in intensity.</p>
+
+            <strong>Process:</strong>
+            <p>
+            The partial derivatives were computed using theseg formulas:
+            \[
+            \frac{\partial I}{\partial x} = I * D_x \\
+            \frac{\partial I}{\partial y} = I * D_y \\
+            \nabla I = \sqrt{\left( \frac{\partial I}{\partial x} \right)^2 + \left( \frac{\partial I}{\partial y} \right)^2}
+            \]
+            Here, \( D_x = [1, -1] \) and \( D_y = [1, -1]^T \), and convolution \( * \) is applied between the image and 
+            the derivative operators.
+            </p>
+
+            <strong>Effectiveness:</strong>
+            <p>To highlight the edges, a threshold was applied to the gradient magnitude image which filtered out noise and 
+                helped us to focus on prominent edges. The thresholding allowed for clearer depiction of edges, although fine-tuning
+                 was necessary to achieve the right balance.</p>
+
+            <div class="image-gallery">
+                <div>
+                    <img src="../images/gradient_x.png" alt="Gradient X">
+                    <p class="description">Gradient X (Cameraman)</p>
+                </div>
+                <div>
+                    <img src="../images/gradient_y.png" alt="Gradient Y">
+                    <p class="description">Gradient Y (Cameraman)</p>
+                </div>
+                <div>
+                    <img src="../images/gradient_magnitude.png" alt="Gradient Magnitude">
+                    <p class="description">Gradient Magnitude (Cameraman)</p>
+                </div>
+                <div>
+                    <img src="../images/binarized_edge.png" alt="Binarized Edge Image">
+                    <p class="description">Binarized Edge Image (Cameraman)</p>
+                </div>
+            </div>
+
+            <!-- Section 1.2 -->
+            <h3>1.2 Derivative of Gaussian (DoG) Filter</h3>
+            <p>The finite difference approach produced noisy results, so to reduce noise and improve edge detection, 
+                a Gaussian blur can be applied to the image before calculating the gradients.</p>
+
+            <strong>Process:</strong>
+            <p>
+            First, the image was smoothed using a Gaussian filter before applying the finite difference operators:
+            \[
+            I_{\text{blurred}} = I * G \\
+            \frac{\partial I}{\partial x} = I_{\text{blurred}} * D_x \\
+            \frac{\partial I}{\partial y} = I_{\text{blurred}} * D_y \\
+            \nabla I = \sqrt{\left( \frac{\partial I}{\partial x} \right)^2 + \left( \frac{\partial I}{\partial y} \right)^2}
+            \]
+            </p>
+
+            <strong>Effectiveness:</strong>
+            <p>The Gaussian filter reduced noise and smoothed the image, leading to more refined edge detection. 
+                Additionally, by combining the Gaussian filter and derivative operators, I used Derivative of Gaussian 
+                (DoG) filters:
+            \[
+            \text{DoG}_x = G * D_x, \quad \text{DoG}_y = G * D_y
+            \]
+            The DoG filters allowed for a more efficient and streamlined computation of edges, producing smoother results.</p>
+
+            <strong>Key Findings:</strong>
+            <p>The DoG method improved the clarity of edges, especially in regions with noise or minor intensity
+                 variations. The smoothing effect from the Gaussian filter helped to reduce noise while still 
+                 highlighting key structural details in the image.</p>
+
+            <div class="image-gallery">
+                <div>
+                    <img src="../images/gradient_x-dog.png" alt="Gradient X (DoG)">
+                    <p class="description">Gradient X (DoG) (Cameraman)</p>
+                </div>
+                <div>
+                    <img src="../images/gradient_y-dog.png" alt="Gradient Y (DoG)">
+                    <p class="description">Gradient Y (DoG) (Cameraman)</p>
+                </div>
+                <div>
+                    <img src="../images/gradient_magnitude-dog.png" alt="Gradient Magnitude (DoG)">
+                    <p class="description">Gradient Magnitude (DoG) (Cameraman)</p>
+                </div>
+                <div>
+                    <img src="../images/dog filter x.png" alt="DoG Filter X">
+                    <p class="description">DoG Filter \( D_x \)</p>
+                </div>
+                <div>
+                    <img src="../images/dog filter y.png" alt="DoG Filter Y">
+                    <p class="description">DoG Filter \( D_y \)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: FUN WITH FREQUENCIES -->
+        <section class="section">
+            <h2>Part 2: Fun with Frequencies</h2>
+
+            <!-- Section 2.1 -->
+            <h3>2.1 Image Sharpening (Unsharp Masking)</h3>
+            <p>Image sharpening enhances the edges and finer details in an image by increasing the presence of
+                 high-frequency components.</p>
+
+            <strong>Process:</strong>
+            <p>Using the unsharp masking technique, I first applied a Gaussian blur to the image, then subtracted
+                 the blurred version from the original to obtain the high-frequency details. The sharpening process
+                  is defined by:
+            \[
+            I_{\text{sharpened}} = I + \alpha (I - I_{\text{blurred}})
+            \]
+            The parameter \( \alpha \) controls the intensity of the sharpening effect.
+            </p>
+
+            <strong>Effectiveness:</strong>
+            <p>When applied to slightly blurred images, this technique restored lost details effectively. However, 
+                when applied to already sharp images, over-sharpening resulted in noise amplification, making the 
+                image appear unnatural.</p>
+
+            <strong>Key Findings:</strong>
+            <p>Unsharp masking worked well in recovering details in blurry images. However, careful tuning of the
+                 sharpening factor \( \alpha \) is required to avoid over-sharpening, which can lead to unwanted noise.</p>
+
+            <div class="image-gallery">
+                <div>
+                    <img src="../images/original.png" alt="Original Image">
+                    <p class="description">Original Image (Apple)</p>
+                </div>
+                <div>
+                    <img src="../images/blurred.png" alt="Blurred Image">
+                    <p class="description">Blurred Image (Apple)</p>
+                </div>
+                <div>
+                    <img src="../images/sharpened.png" alt="Sharpened Image">
+                    <p class="description">Sharpened Image (Apple)</p>
+                </div>
+                <div>
+                    <img src="../images/custom_owl_original.png" alt="Owl Original Image">
+                    <p class="description">Original Image (Owl)</p>
+                </div>
+                <div>
+                    <img src="../images/custom_owl_blurred.png" alt="Owl Blurred Image">
+                    <p class="description">Blurred Image (Owl)</p>
+                </div>
+                <div>
+                    <img src="../images/custom_owl_sharpened.png" alt="Owl Sharpened Image">
+                    <p class="description">Sharpened Image (Owl)</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+        <!-- Section 2.2 -->
+        <h3>2.2 Hybrid Images</h3>
+        <p>Hybrid images combine the low-frequency components of one image with the high-frequency components of 
+            another. This technique creates a shift depending on the viewer's relative distance to the image: the high-frequency 
+            details dominate up close, while the low-frequency components become more obvious from further away.</p>
+
+        <strong>Process:</strong>
+        <p>The following steps were used to create a hybrid image:
+        \[
+        I_{\text{low}} = I_1 * G, \quad I_{\text{high}} = I_2 - (I_2 * G)
+        \]
+        \[
+        I_{\text{hybrid}} = I_{\text{low}} + I_{\text{high}}
+        \]
+        </p>
+
+        <strong>Custom Sigma Values:</strong>
+        <ul>
+            <li><strong>Apple and Orange:</strong> \( \sigma_{\text{low}} = 2 \), \( \sigma_{\text{high}} = 4 \). 
+                The low-frequency components of the apple were extracted with moderate smoothing, while the high-frequency 
+                components of the orange were isolated using a stronger blur.</li>
+            <li><strong>Owl and Ball:</strong> \( \sigma_{\text{low}} = 3.5 \), \( \sigma_{\text{high}} = 10 \). 
+                The custom owl image required a higher sigma to smooth its intricate details, while the ball image 
+                was blurred significantly to capture only the high-frequency details for the hybrid.</li>
+        </ul>
+
+        <strong>Effectiveness:</strong>
+        <p>The hybrid images demonstrated a visual phenomenon where different images appeared based on 
+            the viewing distance. However, the two images being properly aligned was critical to the success of the hybrid
+             image.</p>
+
+        <strong>Key Findings:</strong>
+        <p>While the hybrid technique produced good results, misalignment or incompatible features between the 
+            two images resulted in failure cases. Without a proper alignment of the images,it was difficult to achieve a smooth 
+            transition between the two frequency bands.</p>
+
+        <div class="image-gallery">
+            <div>
+                <img src="../images/hybrid.png" alt="Hybrid Image">
+                <p class="description">Hybrid Image (Apple and Orange)</p>
+            </div>
+        </div>
+        </section>
+
+
+        <section class="section">
+        <!-- Section 2.3 -->
+        <h3>2.3 Gaussian and Laplacian Stacks</h3>
+        <p>Gaussian and Laplacian stacks are key tools in multiresolution image analysis, allowing for smooth 
+            blending of images at different scales.</p>
+
+        <strong>Process:</strong>
+        <p>A Gaussian stack is created by repeatedly applying Gaussian filters to the image, resulting in 
+            progressively blurred versions:
+        \[
+        \text{Gaussian Stack} = \{ G_0, G_1, G_2, \dots, G_n \}
+        \]
+        The Laplacian stack isolates the high-frequency components between consecutive levels of the Gaussian stack:
+        \[
+        \text{Laplacian Stack} = \{ L_0, L_1, L_2, \dots, L_{n-1} \}, \quad L_i = G_i - G_{i+1}
+        \]
+        </p>
+
+        <strong>Effectiveness:</strong>
+        <p>By using these stacks, I could blend images at different resolution levels, ensuring smooth transitions 
+            between the images without visible artifacts.</p>
+
+        <strong>Key Findings:</strong>
+        <p>The Gaussian and Laplacian stacks were especially effective for image blending tasks, as they allowed for
+             multiresolution analysis. This method enabled me to create seamless blends between different images across
+              various frequency bands.</p>
+
+        <div class="image-gallery">
+            <div>
+                <img src="../images/gaussian apple stack.png" alt="Gaussian Stack">
+                <p class="description">Gaussian Stack (Apple)</p>
+            </div>
+            <div>
+                <img src="../images/laplacian orange stack.png" alt="Laplacian Stack">
+                <p class="description">Laplacian Stack (Orange)</p>
+            </div>
+        </div>
+        </section>
+
+        <!-- 2.4 Multiresolution Blending -->
+        <section class="section">
+            <h2>2.4 Multiresolution Blending</h2>
+            <p>Multiresolution blending involves combining two images by blending their details at different scales. 
+                This technique uses Gaussian and Laplacian stacks to gradually blend images, resulting in a smooth 
+                transition between the two. By using a mask that transitions from one image to the other, we can
+                 control which parts of each image dominate in the final output.</p>
+
+            <strong>Process:</strong>
+            <p>The blending process consists of the following steps:
+            <ul>
+                <li>Create Gaussian stacks for the mask to control the blending at multiple scales.</li>
+                <li>Create Laplacian stacks for both images to capture their details at different frequency levels.</li>
+                <li>Blend the corresponding Laplacian levels of both images using the Gaussian mask at each level.</li>
+                <li>Reconstruct the final blended image by combining the blended Laplacian stack levels.</li>
+            </ul>
+            The following equations were used for blending:
+            \[
+            \text{Blended Level}_i = \text{Mask}_i \cdot \text{Laplacian}_i(\text{Image1}) + (1 - \text{Mask}_i) \cdot \text{Laplacian}_i(\text{Image2})
+            \]
+            </p>
+
+            <strong>Custom Mask:</strong>
+            <p>For this experiment, I used a simple horizontal mask where the left half of the mask was filled with 
+                1s and the right half with 0s. This resulted in a smooth left-to-right transition between the two 
+                images that attempts to replicate the findings of the "spline83" paper.</p>
+
+            <div class="image-gallery">
+                <div>
+                    <img src="../images/mask.png" alt="Blending Mask">
+                    <p class="description">Blending Mask</p>
+                </div>
+                <div>
+                    <img src="../images/blended_image.png" alt="Blended Image">
+                    <p class="description">Blended Image (Apple and Orange)</p>
+                </div>
+                <div>
+                    <img src="../images/blended_image_failure.png" alt="Blended Image Failure">
+                    <p class="description">[Failure] Blended Image (Owl Eye and Basketball)</p>
+                </div>
+            </div>
+
+            <strong>Effectiveness:</strong>
+            <p>The multiresolution blending technique enabled smooth, seamless transitions between two images by using a Gaussian mask to blend details at multiple scales, preventing abrupt changes or visible seams. This method is particularly effective for combining images with varying textures, lighting conditions, or focus areas. Additionally, fine-tuning the mask allows for creative control over the blend's smoothness and areas of influence.</p>
+
+
+            <strong>Failure Case:</strong>
+            <p>To address the failure case with my custom images, not every mask seemed to be compatible with my current Laplacian and Gaussian stacking,
+                as the process is highly dependent on the images being used. Without proper fine-tuning of the mask and variables involved,
+                the blend's smoothness can sometimes appear relatively rough.
+            </p>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section class="section">
+            <h2>Conclusion</h2>
+            <p>This project gave me the chance to dive into various image processing techniques, from edge detection 
+                with finite difference and DoG filters to blending images using Gaussian and Laplacian stacks. Since 
+                I regularly use programs like Adobe Photoshop and Lightroom, it was really interesting to see the math 
+                and algorithms behind the tools I use every day. 
+                Understanding how different frequencies affect image clarity, detail, and blending helped me appreciate 
+                the concepts that make these software applications function.</p>
+
+        </section>
+    </main>
+</body>
+</html>
