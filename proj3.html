@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: #ffffff;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #007bff;
+        }
+
+        header h3 {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        header p {
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            color: #007bff;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .section {
+            margin-bottom: 50px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .image-gallery div {
+            flex: 1 1 calc(33.333% - 40px);
+            box-sizing: border-box;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .image-gallery div {
+                flex: 1 1 calc(50% - 40px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .image-gallery div {
+                flex: 1 1 100%;
+            }
+        }
+
+        .description {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CS180: Project #3</h1>
+        <h3>by Adriel Vijuan</h3>
+        <p>Face Morphing</p>
+    </header>
+
+    <main>
+        <!-- INTRODUCTION -->
+        <section class="section">
+            <h2>Introduction</h2>
+            <div>
+                <p>This project focuses on implementing image morphing techniques. The objective 
+                    is to create seamless transitions between images by establishing correspondence points, applying affine transformations, 
+                    and generating intermediate frames to create a smooth morphing sequence. The project involves generating a mid-way face between two images, creating a morph sequence, 
+                    and computing the mean face of a population.
+                </p>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <!-- <div style="flex: 1; padding-right: 10px;">
+                    <img src="../code/morph_sequence.gif" alt="Morph Sequence GIF" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">Morphing GIF</p>
+                </div> -->
+                <div style="flex: 1; padding-right: 10px;">
+                    <img src="images/imageMe.jpg" alt="Image A" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">Image A: Me.jpg</p>
+                </div>
+                <div style="flex: 1;">
+                    <img src="images/imageObama.jpg" alt="Image B" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">Image B: Obama.jpg</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Part 1: CORRESPONDENCES -->
+        <section class="section">
+            <h2>Correspondences</h2>
+            <p>To establish correspondence points between the two images, 
+                I used the provided Correspondence tool to interactively select 
+                key facial features. I exported these points as a JSON file and loaded 
+                them into my code, ensuring precise and consistent mapping. These points 
+                focus on landmarks like the eyes, eyebrows, nose, mouth, chin, and face 
+                outline, including edges and corners to account for the background.</p>
+            <p>The selected points were then used to compute Delaunay triangulation on the average 
+                shape. This divides the image into triangles, facilitating smooth and 
+                realistic transformations by applying affine transformations to each 
+                corresponding triangle.</p>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div style="flex: 1; padding-right: 10px;">
+                    <img src="images/Figure_1.png" alt="Correspondence Points on Image A" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">Correspondence Points on Image A</p>
+                </div>
+                <div style="flex: 1;">
+                    <img src="images/Figure_2.png" alt="Correspondence Points on Image B" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">Correspondence Points on Image B</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 2: MIDWAY FACE -->
+        <section class="section">
+            <h2>Midway Face</h2>
+            <p>To create the midway face, I calculated the average shape by averaging the 
+                corresponding points from both images. Then, I warped both images 
+                into this average shape using affine transformations for each triangle 
+                defined by the Delaunay triangulation. Finally, I averaged the pixel 
+                intensities of the two warped images to produce the midway face.</p>
+            <p>The resulting image shows features from both original images, 
+                 combined to form a composite that looks like a blend of Obama and my faces.</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <img src="images/Figure_3.png" alt="Midway Face" style="width: 50%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+                <p class="description">Midway Face between Image A and Image B</p>
+            </div>
+    
+            <div style="text-align: center; margin-top: 20px;">
+                <img src="images/Figure_4.png" alt="Midway Face" style="width: 50%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+                <p class="description">Midway Face between Image A and Image B with Triangulation</p>
+            </div>
+
+        </section>
+
+        <!-- Part 3: MORPH SEQUENCE -->
+        <section class="section">
+            <h2>Morph Sequence</h2>
+            <p>To create a smooth morphing sequence from Image A to Image B, 
+                I generated a series of intermediate frames by varying a warp 
+                fraction and a dissolve fraction from 0 to 1. The warp fraction controls 
+                the shape transformation, while the dissolve fraction controls the 
+                cross-dissolve of pixel intensities. For each frame, the correspondence 
+                points were interpolated based on the current warp fraction to compute the 
+                intermediate shape. Both images were then warped into this intermediate shape, 
+                and their pixel values were blended using the dissolve frac.</p>
+            <p>The sequence consists of 45 frames, which were compiled into a 
+                GIF to showcase the transition.</p>
+            <div style="text-align: center; margin-top: 20px;">
+              <div style="text-align: center; margin-top: 20px;">
+                  <img src="../code/morph_sequence.gif" alt="Morph Sequence GIF" style="width: 30%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+                  <p class="description">Me morphing into Obama.</p>
+              </div>
+            </div>
+        </section>
+
+        <!-- Part 4: MEAN FACE OF A POPULATION -->
+        <section class="section">
+            <h2>"Mean Face" of a Population</h2>
+            <p>To compute the mean face of a population, I collected a 
+                set of facial images from one of the provided sources in the spec 
+                and used a single set of correspondence points for all images. 
+                I manually selected correspondence points on the first image, 
+                focusing on key facial landmarks. These points were then used for all 
+                images in the dataset as the dataset had already aligned the images.</p>
+            <p>Each individual face was warped into the average shape computed from these 
+                points. After warping all faces to the average shape, I averaged the pixel 
+                intensities to obtain the mean face of the population. This mean face 
+                represents the average appearance and shape of all faces in the dataset.</p>
+            <div style="flex: 1; padding-right: 10px;">
+                <img src="images/population_all.png" style="width: 600%; height: auto; display: block; border-radius: 8px;">
+                <p class="description">Population Images</p>
+            </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <img src="images/Figure_5.png" alt="Mean Face of Population" style="width: 50%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+                    <p class="description" style="text-align: center">Mean Face of the Population</p>
+                </div>
+            
+                <p>Additionally, I warped my own face into the average shape from this population 
+                    and warped the mean face into my Obama's face.</p>
+                
+                <div style="flex: 1; padding-right: 10px;">
+                    <img src="images/Figure_7.png"style="width: 600%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">My Face Warped to Mean Shape of the Population</p>
+                </div>
+
+                <div style="flex: 1;">
+                    <img src="images/Figure_8.png" style="width: 600%; height: auto; display: block; border-radius: 8px;">
+                    <p class="description">Mean Face Warped to My Shape</p>
+                </div>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section class="section">
+            <h2>Conclusion</h2>
+            <p>This project successfully demonstrated image morphing techniques, 
+                including creating midway faces, morph sequences, and 
+                computing the mean face of a population. As someone who 
+                utilizes Photoshop in my freelance work, exploring these 
+                similar types of tools from a fundamental level was incredibly 
+                interesting and rewarding for me. Understanding how these image 
+                manipulation techniques work under the hood enhances my appreciation 
+                for the software I use daily and provides deeper insights into the 
+                processes behind image editing and transformation.</p>
+            
+        </section>
+    </main>
+</body>
+</html>
