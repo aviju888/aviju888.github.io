@@ -128,7 +128,8 @@
 <body>
     <header>
         <h1>CS180: Project #1</h1>
-        <h3>by Adriel Vijuan</h3>
+        <h3><a href="index.html">by Adriel Vijuan</a></h3>
+
         <p>Colorizing the <a href="https://www.loc.gov/collections/prokudin-gorskii/">Prokudin-Gorskii Photo Collection</a>.</p>
     </header>
 
@@ -150,13 +151,13 @@
             </div>
 
             <div style="flex: 0 0 auto;">
-                <img src="data/cathedral.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
+                <img src="../data/cathedral.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
             </div>
             <div style="flex: 0 0 auto;"></div>
-                <img src="data/monastery.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
+                <img src="../data/monastery.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
             </div>
             <div style="flex: 0 0 auto;"></div>
-                <img src="data/tobolsk.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
+                <img src="../data/tobolsk.jpg" alt="Cathedral" style="max-width: 300px; height: 300px; display: block;">
             </div>
         </section>
 
@@ -234,7 +235,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const gallery = document.getElementById('gallery');
-                const imageDirectory = 'output/';
+                const imageDirectory = '../output/';
                 const imageFiles = [
                     { name: 'cathedral.jpg', green: '[-5, 0]', red: '[-5, 1]' },
                     { name: 'church.jpg', green: '[-25, 4]', red: '[-39, 5]' },
@@ -313,11 +314,11 @@
     <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;">
         <div>
             <p><strong>Before:</strong></p>
-            <img src="output/icon-messed-up.jpg" alt="Cathedral Before" style="max-width: 200px; height: 200px; display: block; margin-bottom: 10px;">
+            <img src="../output/icon-messed-up.jpg" alt="Cathedral Before" style="max-width: 200px; height: 200px; display: block; margin-bottom: 10px;">
         </div>
         <div>
             <p><strong>After:</strong></p>
-            <img src="output/icon.jpg" alt="Cathedral After" style="max-width: 200px; height: 200px; display: block;">
+            <img src="../output/icon.jpg" alt="Cathedral After" style="max-width: 200px; height: 200px; display: block;">
         </div>
     </div>
 </section>
@@ -338,7 +339,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const customGallery = document.getElementById('custom-gallery');
-                const imageDirectory = 'output/';
+                const imageDirectory = '../output/';
                 const customImageFiles = [
                     { name: 'custom-1.jpg', green: '[-68, 6]', red: '[-74, 10]' },
                     { name: 'custom-2.jpg', green: '[-66, -15]', red: '[-55, -10]' },

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS180 Project #3</title>
     <style>
         body {
@@ -14,6 +15,11 @@
             height: 100vh;
             margin: 0;
         }
+        .link-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
         a {
             font-size: 1.5em;
             color: #007bff;
@@ -22,6 +28,7 @@
             padding: 10px 20px;
             border-radius: 8px;
             transition: background 0.3s ease, color 0.3s ease;
+            text-align: center;
         }
         a:hover {
             background: #007bff;
@@ -29,7 +36,10 @@
         }
     </style>
 </head>
+
 <body>
-    <a href="web/proj3.html">Go to Project 3</a>
+    <div class="link-container">
+        <a href="web/index.html">Go to Projects</a>
+    </div>
 </body>
 </html>
