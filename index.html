@@ -47,6 +47,7 @@
         .project-links {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 30px;
         }
 
@@ -75,6 +76,13 @@
         .project-link:hover {
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
             transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .project-link {
+                width: 100%;
+                max-width: 300px;
+            }
         }
 
         footer {

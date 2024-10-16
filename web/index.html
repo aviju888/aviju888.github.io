@@ -47,6 +47,7 @@
         .project-links {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 30px;
         }
 
@@ -77,6 +78,13 @@
             transform: scale(1.05);
         }
 
+        @media (max-width: 600px) {
+            .project-link {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -98,15 +106,15 @@
         <section>
             <h2>My Projects</h2>
             <div class="project-links">
-                <a href="proj1.html" class="project-link">
+                <a href="web/proj1.html" class="project-link">
                     <h3>Project #1</h3>
                     <p>Colorizing the Prokudin-Gorskii Photo Collection</p>
                 </a>
-                <a href="proj2.html" class="project-link">
+                <a href="web/proj2.html" class="project-link">
                     <h3>Project #2</h3>
                     <p>Fun with Filters and Frequencies</p>
                 </a>
-                <a href="proj3.html" class="project-link">
+                <a href="web/proj3.html" class="project-link">
                     <h3>Project #3</h3>
                     <p>Face Morphing</p>
                 </a>
