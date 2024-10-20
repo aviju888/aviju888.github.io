@@ -1,355 +1,456 @@
 import os
 import numpy as np
 import cv2
-from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import json
 
 # ##############################################################################
-# ############### CONFIG AND IMAGE LOADING #####################################
+# ############### CONFIG STUFF #################################################
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-images_dir = os.path.join(script_dir, 'images')
-image_A_path = os.path.join(images_dir, '../../web/images/imageMe.jpg')
-image_B_path = os.path.join(images_dir, '../../web/images/imageObama.jpg')
-jsonn = os.path.join(script_dir, 'imageMe_imageObama.json')
+# ##TODO: add more prints for debugging
 
-web_dir = os.path.join(script_dir, '..', 'web')
-images_dir = os.path.join(web_dir, 'images', 'population')
-population_images = [os.path.join(images_dir, f) for f 
-                     in os.listdir(images_dir) if 'a' in f and 
-                     f.endswith(('.jpg', '.png'))]
+nppp = 8 # num correspondence points between imgs
 
-image_A = cv2.imread(image_A_path)
-image_B = cv2.imread(image_B_path)
-if image_A is None or image_B is None:
-    raise ValueError("Failed to load images.")
+def dirs():
+    # setting up directories
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    images_dir = os.path.join(script_dir, '../data')
+    output_dir = os.path.join(script_dir, 'output')
+    points_file = os.path.join(script_dir, 'points.json')
 
-# resizing if necessary
+    os.makedirs(output_dir, exist_ok=True)
 
-hA_orig, wA_orig = image_A.shape[:2]
-hB_orig, wB_orig = image_B.shape[:2]
-scale_A_x, scale_A_y = 1.0, 1.0
-scale_B_x, scale_B_y = 1.0, 1.0
-resized_A = False
-resized_B = False
+    image1_path = os.path.join(images_dir, 'image1.jpg')
+    image2_path = os.path.join(images_dir, 'image2.jpg')
+    image3_path = os.path.join(images_dir, 'image3.jpg')
 
-if image_A.shape != image_B.shape:
-    if image_A.shape[0] < image_B.shape[0] or image_A.shape[1] < image_B.shape[1]:
-        hB, wB = image_B.shape[:2]
-        scale_A_x = wB / wA_orig
-        scale_A_y = hB / hA_orig
-        image_A = cv2.resize(image_A, (wB, hB))
-        resized_A = True
-    else:
-        hA, wA = image_A.shape[:2]
-        scale_B_x = wA / wB_orig
-        scale_B_y = hA / hB_orig
-        image_B = cv2.resize(image_B, (wA, hA))
-        resized_B = True
+    return script_dir, images_dir, output_dir, points_file, image1_path, image2_path, image3_path
 
-# need to convert images to rgb
-image_A_rgb = cv2.cvtColor(image_A, cv2.COLOR_BGR2RGB)
-image_B_rgb = cv2.cvtColor(image_B, cv2.COLOR_BGR2RGB)
+def load_imgs(image1_path, image2_path, image3_path):
+    """
+    Loads three images and converts them to RGB.
+    """
+    print("loading images...")
+    image1 = cv2.imread(image1_path)
+    image2 = cv2.imread(image2_path)
+    image3 = cv2.imread(image3_path)
+
+    if image1 is None or image2 is None or image3 is None:
+        raise ValueError("failed to load images. check file paths.")
+
+    # Convert to RGB
+    image1_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
+    image2_rgb = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
+    image3_rgb = cv2.cvtColor(image3, cv2.COLOR_BGR2RGB)
+
+    print("images loaded and converted to rgb.")
+    return image1_rgb, image2_rgb, image3_rgb
 
 # ##############################################################################
-# ############### HELPERS ######################################################
+# ############### MAIN CHUNK OF STUFF AND HELPERS ##############################
 
-# lots of helper stuff for visualising 
+def display_imgs(images, titles, delay=0):
+    print("displaying images...")
+    plt.figure(figsize=(15, 5))
+    for i, (img, title) in enumerate(zip(images, titles)):
+        plt.subplot(1, len(images), i + 1)
+        plt.imshow(img)
+        plt.title(title)
+        plt.axis('off')
+    plt.tight_layout()
+    if delay > 0:
+        plt.show(block=False)
+        plt.pause(delay)
+        plt.close()
+    else:
+        plt.show()
+    print("images displayed.")
 
-def get_points(image, num_points):
-    plt.imshow(image)
-    plt.title(f"Select {num_points} points on this image")
-    points = plt.ginput(num_points, timeout=0)
-    plt.close()
-    return np.array(points, dtype=np.float32)
+def correspondence(image1, image2, num_points, description):
+    # user input. get correspondence points for all the imgs
 
-def show_img(image, title=''):
-    plt.figure()
-    plt.imshow(image)
-    plt.title(title)
+    print(f"getting {num_points} corresponding points for {description}...")
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+    ax1.imshow(image1)
+    ax1.set_title('Image 1')
+    ax1.axis('off')
+    ax2.imshow(image2)
+    ax2.set_title('Image 2')
+    ax2.axis('off')
+
+    print(f"click on a point in image 1, then the corresponding point in image 2. repeat for {num_points} points.")
+
+    class CorrSelect:
+        def __init__(self, ax1, ax2, num_points):
+            self.ax1 = ax1
+            self.ax2 = ax2
+            self.num_points = num_points
+            self.current_image = 'Image1'
+            self.pts1 = []
+            self.pts2 = []
+            self.cid = fig.canvas.mpl_connect('button_press_event', self.onclick)
+
+        def onclick(self, event):
+            if event.inaxes == self.ax1 and self.current_image == 'Image1':
+                x, y = event.xdata, event.ydata
+                self.pts1.append([x, y])
+                self.ax1.scatter(x, y, c='r', marker='o')
+                print(f"image1 point {len(self.pts1)}: ({x:.2f}, {y:.2f})")
+                self.current_image = 'Image2'
+                fig.canvas.draw()
+            elif event.inaxes == self.ax2 and self.current_image == 'Image2':
+                x, y = event.xdata, event.ydata
+                self.pts2.append([x, y])
+                self.ax2.scatter(x, y, c='b', marker='o')
+                x1, y1 = self.pts1[-1]
+                x2, y2 = self.pts2[-1]
+                self.ax1.plot([x1, x2], [y1, y2], 'g--', linewidth=1)
+                print(f"image2 point {len(self.pts2)}: ({x:.2f}, {y:.2f})")
+                self.current_image = 'Image1'
+                fig.canvas.draw()
+            else:
+                print("click on the correct image in the correct order.")
+
+            if len(self.pts1) == self.num_points and len(self.pts2) == self.num_points:
+                fig.canvas.mpl_disconnect(self.cid)
+                plt.close()
+
+    selector = CorrSelect(ax1, ax2, num_points)
+    plt.show()
+
+    if len(selector.pts1) != num_points or len(selector.pts2) != num_points:
+        raise ValueError("not enough points selected.")
+
+    pts1 = np.array(selector.pts1, dtype=np.float32)
+    pts2 = np.array(selector.pts2, dtype=np.float32)
+
+    print(f"selected points:\npts1: {pts1}\npts2: {pts2}")
+    return pts1, pts2
+
+# 1: visualize correspondences
+def visualize1(image1, image2, pts1, pts2, title, save_path):
+    print(f"visualizing correspondences: {title}")
+
+    plt.figure(figsize=(20, 10))
+
+    plt.subplot(1, 2, 1)
+    plt.imshow(image1)
+    plt.scatter(pts1[:, 0], pts1[:, 1], c='r', marker='o')
+    plt.title('Image 1 Points')
     plt.axis('off')
-    plt.show()
 
+    plt.subplot(1, 2, 2)
+    plt.imshow(image2)
+    plt.scatter(pts2[:, 0], pts2[:, 1], c='b', marker='o')
+    plt.title('Image 2 Points')
+    plt.axis('off')
 
-def vis_triangulation(image, points, tri, title=''):
-    image_copy = image.copy()
-    for t in tri.simplices:
-        pts = points[t].astype(int)
-        cv2.polylines(image_copy, [pts], isClosed=True, 
-                      color=(0, 255, 0), thickness=1)
-    for pt in points:
-        cv2.circle(image_copy, (int(pt[0]), int(pt[1])), 2, (255, 0, 0), -1)
-    show_img(image_copy, title)
+    for i in range(len(pts1)):
+        x1, y1 = pts1[i]
+        x2, y2 = pts2[i]
+        plt.plot([x1, x2], [y1, y2], 'g--', linewidth=1)
 
-# stuff for displaying (progression and also images)
-def display_imgs(images, titles):
-    n = len(images)
-    plt.figure(figsize=(15, 5))
-    for i in range(n):
-        plt.subplot(1, n, i+1)
-        plt.imshow(images[i])
-        plt.title(titles[i])
-        plt.axis('off')
-    plt.tight_layout()
-    plt.show()
+    try:
+        plt.savefig(save_path, bbox_inches='tight')
+        print(f"correspondences visualization saved to {save_path}.")
+    except Exception as e:
+        print(f"failed to save correspondences visualization to {save_path}: {e}")
 
-def display_progression(seq, num_steps=5):
-    indices = np.linspace(0, len(seq)-1, num_steps, dtype=int)
-    images = [seq[i] for i in indices]
-    titles = [f"Frame {i}" for i in indices]
-    n = len(images)
-    plt.figure(figsize=(15, 5))
-    for i in range(n):
-        plt.subplot(1, n, i+1)
-        plt.imshow(images[i])
-        plt.title(titles[i])
-        plt.axis('off')
-    plt.tight_layout()
-    plt.show()
+    plt.close()
+    print(f"correspondences visualized and saved: {title}")
+
+# 2: visualize transformations
+def visualize2(image, H, pts_source, pts_target, title, save_path):
+
+    print(f"visualizing transformation: {title}")
+    print(f"h shape: {H.shape}")
+    print(f"h contents:\n{H}")
+
+    pts_source_homogeneous = np.hstack([pts_source, np.ones((pts_source.shape[0], 1))])  # Shape: (N, 3)
+    transformed_pts_homogeneous = np.dot(H, pts_source_homogeneous.T).T  # shape: (N, 3)
+
+    transformed_pts_homogeneous /= transformed_pts_homogeneous[:, [2]] + 1e-8  # Avoid division by zero
+    transformed_pts = transformed_pts_homogeneous[:, :2]
+
+    print(f"transformed points:\n{transformed_pts}")
+
+    plt.figure(figsize=(10, 6))
+    plt.imshow(image)
+    plt.scatter(pts_target[:, 0], pts_target[:, 1], c='r', marker='o', label='Target Points')
+    plt.scatter(transformed_pts[:, 0], transformed_pts[:, 1], c='b', marker='x', label='Transformed Source Points')
+    plt.title(title)
+    plt.legend()
+    plt.axis('off')
+
+    try:
+        plt.savefig(save_path, bbox_inches='tight')
+        print(f"transformation visualization saved to {save_path}.")
+    except Exception as e:
+        print(f"failed to save transformation visualization to {save_path}: {e}")
+
+    plt.close()
+    print(f"transformation visualized and saved: {title}")
+
+# compute homogrpahy matrix
+def computeH(im1_pts, im2_pts):
+    print("computing computeH...")
+    # DLT algorithm
+    N = im1_pts.shape[0]
+    if N < 4:
+        raise ValueError("at least 4 points are required for computeH")
+    A = []
+    for i in range(N):
+        x, y = im1_pts[i][0], im1_pts[i][1]
+        x_prime, y_prime = im2_pts[i][0], im2_pts[i][1]
+        A.append([-x, -y, -1, 0, 0, 0, x * x_prime, y * x_prime, x_prime])
+        A.append([0, 0, 0, -x, -y, -1, x * y_prime, y * y_prime, y_prime])
+
+    A = np.array(A)
+    U, S, Vt = np.linalg.svd(A)
+    h = Vt[-1, :]  # last row of Vt -> smallest singular value
+    H = h.reshape((3, 3))
+    H /= H[2, 2]
+    print(f"computed computeH h:\n{H}")
+    return H
+
+#figure out panorama size bc offsets
+def pano_size(images, homographies):
+
+    print("computing panorama size...")
+    all_corners = []
+
+    for i, (image, H) in enumerate(zip(images, homographies)):
+        h, w = image.shape[:2]
+        corners = np.array([
+            [0, 0, 1],
+            [w, 0, 1],
+            [w, h, 1],
+            [0, h, 1]
+        ])  # shape: (4, 3)
+
+        # use computeH
+        transformed_corners = np.dot(H, corners.T).T
+
+        # for normalizing
+        transformed_corners /= transformed_corners[:, [2]] + 1e-8  
+        transformed_corners = transformed_corners[:, :2]
+        print(f"transformed corners for image {i+1}:\n{transformed_corners}")
+        all_corners.append(transformed_corners)
+
+    all_corners = np.vstack(all_corners)
+    print(f"all transformed corners:\n{all_corners}")
+    x_min, y_min = np.floor(np.min(all_corners, axis=0)).astype(int)
+    x_max, y_max = np.ceil(np.max(all_corners, axis=0)).astype(int)
+
+    panorama_width = x_max - x_min
+    panorama_height = y_max - y_min
+    print(f"panorama width: {panorama_width}, panorama height: {panorama_height}")
+
+    offset_x = -x_min
+    offset_y = -y_min
+    print(f"computed offsets: x_offset = {offset_x}, y_offset = {offset_y}")
+
+    return (panorama_height, panorama_width), (offset_x, offset_y)
+
+# warp using computeH matrix -- applies offset
+def warpImage(image, H, panorama_size, offset):
+
+    print("warping image...")
+
+    panorama_height, panorama_width = panorama_size
+    offset_x, offset_y = offset
+
+    warped_image = np.zeros((panorama_height, panorama_width, 3), dtype=np.uint8)
+    H_inv = np.linalg.inv(H)
+
+    y_indices, x_indices = np.indices((panorama_height, panorama_width))
+    x_indices_flat = x_indices.flatten()
+    y_indices_flat = y_indices.flatten()
+
+    x_panorama = x_indices_flat - offset_x # offsetttt
+    y_panorama = y_indices_flat - offset_y
+
+    # homog coords
+    ones = np.ones_like(x_panorama)
+    output_coords = np.stack((x_panorama, y_panorama, ones), axis=1)  # shape: (N, 3)
+
+    # transform with H inv
+    source_coords = np.dot(H_inv, output_coords.T).T  # shape: (N, 3)
+    source_coords /= source_coords[:, [2]] + 1e-8  # Normalize
+    x_src = source_coords[:, 0]
+    y_src = source_coords[:, 1]
+
+    x_src_int = np.floor(x_src).astype(np.int32)
+    y_src_int = np.floor(y_src).astype(np.int32)
+
+    # mask of valid coordinates inside bounds
+    valid_mask = (
+        (x_src_int >= 0) & (x_src_int < image.shape[1]) &
+        (y_src_int >= 0) & (y_src_int < image.shape[0])
+    )
+
+    x_dst = x_indices_flat[valid_mask]
+    y_dst = y_indices_flat[valid_mask]
+    x_src_valid = x_src_int[valid_mask]
+    y_src_valid = y_src_int[valid_mask]
+
+    # FINAL WARPPPPPP
+    warped_image[y_dst, x_dst] = image[y_src_valid, x_src_valid]
+    print("image warped successfully.")
+    return warped_image
+
+# feather blending mask -- accounts for dist from img borders
+def feather_mask(image):
+
+    h, w = image.shape[:2]
+    mask = np.zeros((h, w), dtype=np.float32)
+    y, x = np.indices((h, w))
+    center_x = w / 2
+    center_y = h / 2
+
+    distance = np.sqrt((x - center_x) ** 2 + (y - center_y) ** 2)
+    max_distance = np.sqrt(center_x ** 2 + center_y ** 2)
+    mask = 1 - (distance / max_distance)
+
+    mask = np.power(mask, 2)
+    return mask
+
+# uses feather mask, blends imgs
+def blend_imgs(warped_images, panorama_size, offset):
+    print("blending images into mosaic...")
+    panorama = np.zeros((panorama_size[0], panorama_size[1], 3), dtype=np.float32)
+    weight_sum = np.zeros((panorama_size[0], panorama_size[1]), dtype=np.float32)
+
+    for i, warped_image in enumerate(warped_images):
+        print(f"processing warped image {i + 1}...")
+        mask = (cv2.cvtColor(warped_image, cv2.COLOR_RGB2GRAY) > 0).astype(np.float32)
+
+        feat_mask = feather_mask(warped_image) * mask
+        feat_mask_3ch = cv2.merge([feat_mask, feat_mask, feat_mask])
+
+        # adding to panorama
+        panorama += warped_image.astype(np.float32) * feat_mask_3ch
+
+        weight_sum += feat_mask
+
+    weight_sum[weight_sum == 0] = 1.0
+
+    # normalizing
+    panorama /= weight_sum[..., np.newaxis]
+    panorama = np.clip(panorama, 0, 255).astype(np.uint8)
+
+    print("mosaic finished successfully (with feather blending)!")
+    return panorama
 
 # ##############################################################################
-# ############### AFFINE FUNCS ################################################
+# ############### MAIN FUNCTION ################################################
 
-#  affine transformation matrix 
-def compute_affine(tri1_pts, tri2_pts):
-    ones = np.ones((3, 1))
-    X = np.hstack([tri1_pts, ones])
-    Y = tri2_pts
-    A_matrix = np.linalg.lstsq(X, Y, rcond=None)[0].T
-    return A_matrix
+def main():
+    print("program started.")
 
-# affine transformation for triangular region
-def apply_affine(src, src_tri, dst_tri, size):
-    affine_mat = compute_affine(src_tri, dst_tri)
-    affine_mat_inv = np.linalg.inv(np.vstack([affine_mat, [0, 0, 1]]))[:2, :]
-    x, y = np.meshgrid(np.arange(size[0]), np.arange(size[1]))
-    coords = np.stack([x.flatten(), y.flatten(), np.ones(x.size)])
-    src_coords = affine_mat_inv @ coords
-    src_coords = src_coords[:2, :].reshape(2, size[1], size[0])
-    warped_img = cv2.remap(src, src_coords[0].astype(np.float32), 
-                           src_coords[1].astype(np.float32), cv2.INTER_LINEAR, 
-                           borderMode=cv2.BORDER_REFLECT_101)
-    return warped_img
+    # pt1 fix dirs
+    # ----------------------------------------
+    # Set up directories
+    script_dir, images_dir, output_dir, points_file, image1_path, image2_path, image3_path = dirs()
+    image1_rgb, image2_rgb, image3_rgb = load_imgs(image1_path, image2_path, image3_path)
+    display_imgs([image1_rgb, image2_rgb, image3_rgb], ["Image 1", "Image 2", "Image 3"])
 
-# ##############################################################################
-# ############### MORPH FUNCS ##################################################
+    num_points = nppp 
 
-def morph(im1, im2, im1_pts, im2_pts, tri, warp_frac, dissolve_frac):
-    intermediate_pts = (1 - warp_frac) * im1_pts + warp_frac * im2_pts
-    img_morphed = np.zeros_like(im1, dtype=np.float32)
+    # pt2 correspondence pts
+    # --------------------------------------
+    # SAVED OR NEW?
+    use_saved = input("use saved points from json file? (y/n): ").strip().lower()
 
-    for t in tri.simplices:
-        tri_pts1 = im1_pts[t]
-        tri_pts2 = im2_pts[t]
-        tri_intermediate = intermediate_pts[t]
-
-        # bounding rectangle
-        r = cv2.boundingRect(np.float32([tri_intermediate]))
-        x_start, y_start, w, h = r
-
-        tri_intermediate_rect = tri_intermediate - np.array([x_start, y_start])
-        tri_pts1_rect = tri_pts1 - np.array([x_start, y_start])
-        tri_pts2_rect = tri_pts2 - np.array([x_start, y_start])
-
-        mask = np.zeros((h, w), dtype=np.float32)
-        cv2.fillConvexPoly(mask, np.int32(tri_intermediate_rect), 1.0)
-
-        # cropping
-        img1_cropped = im1[y_start:y_start+h, x_start:x_start+w]
-        img2_cropped = im2[y_start:y_start+h, x_start:x_start+w]
-
-        size = (w, h)
-
-        # warp and blend
-        im1_warped = apply_affine(img1_cropped, tri_pts1_rect, 
-                                  tri_intermediate_rect, size)
-        im2_warped = apply_affine(img2_cropped, tri_pts2_rect, 
-                                  tri_intermediate_rect, size)
-        img_rect = (1 - dissolve_frac) * im1_warped + dissolve_frac * im2_warped
-
-        # mask  blended triangle onto morphed image 
-        img_morphed[y_start:y_start+h, x_start:x_start+w][mask > 0] = img_rect[mask > 0]
-
-    return img_morphed.astype(np.uint8)
-
-def gen_morph_seq(im1, im2, im1_pts, im2_pts, tri, num_frames=45):
-    seq = []
-    for i in range(num_frames + 1):
-        frac = i / num_frames
-        warp_frac = frac
-        dissolve_frac = frac
-        morphed_img = morph(im1, im2, im1_pts, im2_pts, tri, warp_frac, dissolve_frac)
-        seq.append(morphed_img)
-    return seq
-
-def save_morph_seq(seq, output_dir):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    for i, frame in enumerate(seq):
-        output_path = os.path.join(output_dir, f"frame_{i:03d}.jpg")
-        cv2.imwrite(output_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
-
-# ##############################################################################
-# ############### PART 4: MEAN FACE ############################################
-
-def save_points(points, file_path):
-    with open(file_path, 'w') as file:
-        json.dump({'points': points.tolist()}, file)
-    print(f"[INFO] Points saved to {file_path}")
-
-def load_points(file_path):
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-    return np.array(data['points'], dtype=np.float32)
-
-def mean_face(images, points):
-    num_images = len(images)
-    h, w = images[0].shape[:2]
-    mean_image = np.zeros((h, w, 3), dtype=np.float32)
-    mean_points = np.zeros((points[0].shape[0], 2), dtype=np.float32)
-
-    for img, pts in zip(images, points):
-        mean_image += img
-        mean_points += pts
-
-    mean_image /= num_images
-    mean_points /= num_images
-
-    return mean_image.astype(np.uint8), mean_points
-
-def morph2(source_img, source_pts, target_img, target_pts, tri, num_frames=30):
-    seq = []
-    for i in range(num_frames + 1):
-        alpha = i / num_frames
-        intermediate_pts = (1 - alpha) * source_pts + alpha * target_pts
-        morphed_img = morph(source_img, target_img, source_pts, target_pts, tri, warp_frac=alpha, dissolve_frac=alpha)
-        seq.append(morphed_img)
-    return seq
-
-# ##############################################################################
-# ############### MAIN TESTING  ################################################
-
-if __name__ == "__main__":
-
-    ######### pts 1-3
-    use_json = input("load correspondence points from JSON file? (y/n): ").strip().lower()
-    if use_json == 'y':
-        json_file_path = jsonn
-        if not os.path.exists(json_file_path):
-            raise FileNotFoundError(f"JSON file not found: {json_file_path}")
-        with open(json_file_path, 'r') as f:
-            data = json.load(f)
-        pts1 = np.array(data['im1Points'], dtype=np.float32)
-        pts2 = np.array(data['im2Points'], dtype=np.float32)
-
-        # adjust
-        if resized_A:
-            pts1[:, 0] *= scale_A_x
-            pts1[:, 1] *= scale_A_y
-        if resized_B:
-            pts2[:, 0] *= scale_B_x
-            pts2[:, 1] *= scale_B_y
-
-        # add corners
-        print("adding corner points to the correspondence points.")
-        h, w = image_A_rgb.shape[:2]
-        corners = np.array([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]], dtype=np.float32)
-        pts1 = np.vstack([pts1, corners])
-        pts2 = np.vstack([pts2, corners])
-
-        np.save('pts1.npy', pts1)
-        np.save('pts2.npy', pts2)
+    # old points
+    if use_saved == 'y' and os.path.exists(points_file):
+        with open(points_file, 'r') as f:
+            points_data = json.load(f)
+        pts1 = np.array(points_data['pts1'], dtype=np.float32)
+        pts2 = np.array(points_data['pts2'], dtype=np.float32)
+        pts3 = np.array(points_data['pts3'], dtype=np.float32)
+        pts2_3 = np.array(points_data['pts2_3'], dtype=np.float32)
     else:
-        # case if manual
-        num_points = int(input("enter the # of correspondence points: "))
-        print("Select points for Image A.")
-        pts1 = get_points(image_A_rgb, num_points)
-        print("Select corresponding points for Image B.")
-        pts2 = get_points(image_B_rgb, num_points)
-        # add corner points #corners
-        print("adding corner points to the correspondence points.")
+    # else, new points
+        print("collecting new points.")
+        print("select points between image 1 and image 2.")
+        pts1, pts2 = correspondence(image1_rgb, image2_rgb, num_points, "Image 1 and Image 2")
 
-        h, w = image_A_rgb.shape[:2]
-        corners = np.array([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]], 
-                           dtype=np.float32)
-        pts1 = np.vstack([pts1, corners])
-        pts2 = np.vstack([pts2, corners])
+        print("select points between image 3 and image 2.")
+        pts3, pts2_3 = correspondence(image3_rgb, image2_rgb, num_points, "Image 3 and Image 2")
 
-        np.save('pts1.npy', pts1)
-        np.save('pts2.npy', pts2)
+        with open(points_file, 'w') as f:
+            json.dump({
+                'pts1': pts1.tolist(), 'pts2': pts2.tolist(), 'pts3': pts3.tolist(), 'pts2_3': pts2_3.tolist()
+            })
 
+    # just in case
+    if not (pts1.shape == pts2.shape == pts3.shape == pts2_3.shape):
+        print("point arrays do not have the same shape.")
+        return
 
-    print("displaying original images...")
-    display_imgs([image_A_rgb, image_B_rgb], ["Image A", "Image B"])
+    # pt3 homographies
+    # -----------------------------------------------------------
+    # visualize pt2 stuff
+    visualize1(
+        image1_rgb, image2_rgb, pts1, pts2,
+        "Correspondences between Image 1 and Image 2",
+        os.path.join(images_dir, "correspondences_image1_image2.png")
+    )
 
-    average_pts = (pts1 + pts2) / 2.0
-    tri = Delaunay(average_pts)
-    vis_triangulation(image_A_rgb, pts1, tri) # triangulation on A
-    vis_triangulation(image_B_rgb, pts2, tri) # triangulation on B
-    mid_face = morph(image_A_rgb, image_B_rgb, pts1, pts2, tri, 0.5, 0.5)
-    show_img(mid_face) # midface
+    visualize1(
+        image3_rgb, image2_rgb, pts3, pts2_3,
+        "Correspondences between Image 3 and Image 2",
+        os.path.join(images_dir, "correspondences_image3_image2.png")
+    )
 
-    morph_seq = gen_morph_seq(image_A_rgb, image_B_rgb, pts1, pts2, tri, num_frames=45)
-    display_progression(morph_seq, num_steps=6)
+    # compute h
+    print("computing homographies...")
+    H1to2 = computeH(pts1, pts2)  # img1 to 2
+    H3to2 = computeH(pts3, pts2_3)  # img3 to 2
 
-    output_dir = os.path.join(script_dir, 'morph_frames')
-    save_morph_seq(morph_seq, output_dir)
+    visualize2(
+        image2_rgb, H1to2, pts1, pts2,
+        "Point Transformation for Image 1",
+        os.path.join(images_dir, "transformation_image1.png")
+    )
 
-    ######### Part 4: Mean Face
+    visualize2(
+        image2_rgb, H3to2, pts3, pts2_3,
+        "Point Transformation for Image 3",
+        os.path.join(images_dir, "transformation_image3.png")
+    )
 
-    # check f a points file already exists for this pop
-    json_file_path = os.path.join(script_dir, 'population_points.json')
-    if os.path.exists(json_file_path):
-        overwrite = input("points file for population already exists. overwrite? (y/n): ").strip().lower()
-        if overwrite == 'y':
-            first_image = cv2.imread(population_images[0])
-            first_image_rgb = cv2.cvtColor(first_image, cv2.COLOR_BGR2RGB)
-            num_points = int(input("enter the # of correspondence points: "))
-            pts = get_points(first_image_rgb, num_points)
-            h, w = first_image_rgb.shape[:2]
-            corners = np.array([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]], 
-                               dtype=np.float32)
-            pts = np.vstack([pts, corners])
-            save_points(pts, json_file_path)
-        else:
-            print("loading points from existing.")
-            pts = load_points(json_file_path)
-    else:
-        first_image = cv2.imread(population_images[0])
-        first_image_rgb = cv2.cvtColor(first_image, cv2.COLOR_BGR2RGB)
-        num_points = int(input("enter the # of correspondence points: "))
-        pts = get_points(first_image_rgb, num_points)
-        h, w = first_image_rgb.shape[:2]
-        corners = np.array([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]], 
-                           dtype=np.float32)
-        pts = np.vstack([pts, corners])
-        save_points(pts, json_file_path)
+    # pt4: do panorama size and warp imgs
+    # ----------------------------------------------
 
-    population_points = [pts for _ in population_images]
-    population_images_rgb = [cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB) 
-                             for img_path in population_images]
+    print("computing panorama size...")
+    homographies = [H1to2, np.eye(3), H3to2]  # The reference is Image 2
+    images = [image1_rgb, image2_rgb, image3_rgb]
+    panorama_size, offset = pano_size(images, homographies)
 
-    # Compute the mean face
-    mean_image, mean_pts = mean_face(population_images_rgb, population_points)
-    show_img(mean_image, "Mean Face")
+    # Warp images to align them onto the panorama canvas
+    print("warping images onto panorama canvas...")
+    warped_image1 = warpImage(image1_rgb, H1to2, panorama_size, offset)  # img1 to img2
+    warped_image2 = warpImage(image2_rgb, np.eye(3), panorama_size, offset)  # ref (img2)
+    warped_image3 = warpImage(image3_rgb, H3to2, panorama_size, offset)  # img3 to img2
 
-    # Perform Delaunay triangulation on the mean points
-    tri = Delaunay(mean_pts)
-    vis_triangulation(mean_image, mean_pts, tri, "Triangulation on Mean Face")
+    # Display original and warped images
+    display_imgs([image1_rgb, image2_rgb, image3_rgb], ["img1", "img2 (reference)", "img3"])
+    display_imgs([warped_image1, warped_image2, warped_image3], ["warped img1", "warped img2 (reference)", "warped img3"])
 
-    print("Mean face computation complete.")
+    # pt5: mosaic -- feather blending
+    # -----------------------------------------------------
+    print("creating mosaic with feather blending...")
+    warped_images = [warped_image1, warped_image2, warped_image3]
+    panorama = blend_imgs(warped_images, panorama_size, offset)
 
-    ######### Morphing Image A to Mean Face
-    print("Morphing Image A to Mean Face...")
-    morph_seq_A_to_mean = morph2(image_A_rgb, pts, mean_image, mean_pts, tri)
-    display_progression(morph_seq_A_to_mean, num_steps=6)
+    # FINAL MOSAAICCCCC
+    mosaic_path = os.path.join(output_dir, 'mosaic.jpg')
+    cv2.imwrite(mosaic_path, cv2.cvtColor(panorama, cv2.COLOR_RGB2BGR))
+    print(f"mosaic saved to {mosaic_path}.")
+    display_imgs([panorama], ["Mosaic"])
+    print("program completed successfully.")
 
-    ######### Morphing Mean Face to Image B
-    print("Morphing Mean Face to Image B...")
-    morph_seq_mean_to_B = morph2(mean_image, mean_pts, image_B_rgb, pts, tri)
-    display_progression(morph_seq_mean_to_B, num_steps=6)
-
-
-
-    print("completed.")
+if __name__ == '__main__':
+    main()
