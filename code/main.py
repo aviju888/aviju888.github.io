@@ -49,7 +49,7 @@ HIGH_QUALITY_MODE_CONFIG = {
     'descriptor_window_size': 80,   # larger window
     'descriptor_size': 5,           # larger patch
     'feature_ratio_thresh': 0.55,   # stricter ratio
-    'ransac_max_iters': 8000,       # more iterations
+    'ransac_max_iters': 6000,       # more iterations
     'ransac_inlier_thresh': 0.5,    # tighter inlier thresh
 }
 
@@ -497,11 +497,11 @@ def visualize_anms_corners(image, keypoints, title, save_path):
     plt.close()
     print(f"anms corners saved to {save_path}.")
 
-# def visualize_descriptors(image, keypoints, descriptors, num_descriptors=5, save_path=None):
+# def visualize_descriptors(image, keypoints, descriptors, config1, num_descriptors=5, save_path=None):
 #     print("visualizing feature descriptors.")
 #     plt.figure(figsize=(num_descriptors * 2, 2))
 #     for i in range(min(num_descriptors, len(descriptors))):
-#         patch = descriptors[i].reshape((config['descriptor_size'], config['descriptor_size']))
+#         patch = descriptors[i].reshape((config1['descriptor_size'], config1['descriptor_size']))
 #         patch = (patch - patch.min()) / (patch.max() - patch.min() + 1e-8)
 #         plt.subplot(1, num_descriptors, i + 1)
 #         plt.imshow(patch, cmap='gray')
@@ -511,6 +511,7 @@ def visualize_anms_corners(image, keypoints, title, save_path):
 #         plt.savefig(save_path, bbox_inches='tight')
 #         print(f"descriptors saved to {save_path}.")
 #     plt.show()
+
 
 def visualize_matches(image1, image2, keypoints1, keypoints2, matches, title, save_path):
     print(f"visualizing matches: {title}")
@@ -886,6 +887,11 @@ def partB(configuration):
         "final matches image3 image2",
         os.path.join(output_dir, "final_matches_image3_image2.png")
     )
+
+    # visualize_descriptors(image1_rgb, valid_keyp1, descriptors1, config, save_path=os.path.join(output_dir, "descriptors_image1.png"))
+    # visualize_descriptors(image2_rgb, valid_keyp2, descriptors2, config, save_path=os.path.join(output_dir, "descriptors_image2.png"))
+    # visualize_descriptors(image3_rgb, valid_keyp3, descriptors3, config, save_path=os.path.join(output_dir, "descriptors_image3.png"))
+
 
     # step 5: Compute Homographies
     print("\n---> STEP 5: compute homographies")
