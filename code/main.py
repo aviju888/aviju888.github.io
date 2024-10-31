@@ -49,7 +49,7 @@ HIGH_QUALITY_MODE_CONFIG = {
     'descriptor_window_size': 80,   # larger window
     'descriptor_size': 5,           # larger patch
     'feature_ratio_thresh': 0.55,   # stricter ratio
-    'ransac_max_iters': 6000,       # more iterations
+    'ransac_max_iters': 8000,       # more iterations
     'ransac_inlier_thresh': 0.5,    # tighter inlier thresh
 }
 
@@ -85,9 +85,9 @@ def dirs():
 
     os.makedirs(output_dir, exist_ok=True)
 
-    image1_path = os.path.join(images_dir, 'image1d.jpg')
-    image2_path = os.path.join(images_dir, 'image2d.jpg')
-    image3_path = os.path.join(images_dir, 'image3d.jpg')
+    image1_path = os.path.join(images_dir, 'image1e.jpg')
+    image2_path = os.path.join(images_dir, 'image2e.jpg')
+    image3_path = os.path.join(images_dir, 'image3e.jpg')
 
     return script_dir, images_dir, output_dir, points_file, image1_path, image2_path, image3_path
 
