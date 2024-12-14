@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS180: Project - Image Panorama Creation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+    <style>
+        /* general styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* header */
+        header {
+            background: #ffffff;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #007bff;
+        }
+
+        header h3 {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        header p {
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        /* links */
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        /* main */
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* sections */
+        .section {
+            margin-bottom: 50px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            font-size: 2.2em;
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .section h3 {
+            font-size: 1.6em;
+            color: #007bff;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .section p {
+            margin-bottom: 20px;
+        }
+
+        /* images */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* gallery */
+        .image-gallery {
+            display: flex;
+            flex-direction: column; /* vertical stack */
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .image-container img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .description {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* credit */
+        .credit {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        /* responsive */
+        @media (max-width: 600px) {
+            .section {
+                padding: 15px;
+            }
+
+            .section h2 {
+                font-size: 1.8em;
+            }
+
+            .image-container {
+                max-width: 100%;
+            }
+
+            .description {
+                font-size: 0.9em;
+            }
+
+            .credit {
+                font-size: 0.85em;
+            }
+        }
+
+        /* lists and code */
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        code {
+            background: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CS180: Project 4</h1>
+        <h3><a href="../../index.html">by Adriel Vijuan</a></h3>
+        <p>Stitching Photo Mosaics (Panoramas)</p> 
+    </header>
+
+    <main>
+        <!-- part a: warping & mosaicing -->
+        <section class="section">
+            <h2>Part A: Image Warping and Mosaicing</h2>
+        </section>
+        <!-- intro -->
+        <section class="section">
+            <h2>Introduction</h2>
+            <p>This project involves creating a seamless panorama by stitching together three overlapping images. 
+                The process includes selecting corresponding points between images, computing homographies, 
+                warping images to align them, and blending the warped images into a cohesive mosaic. 
+                The objective is to demonstrate image alignment techniques and advanced image processing 
+                using Python.</p>
+            
+            <!-- gallery -->
+            <div class="image-gallery">
+                <div class="image-container">
+                    <img src="../data/image1.jpg">
+                    <p class="description">Image 1: Left</p>
+                </div>
+                <div class="image-container">
+                    <img src="../data/image2.jpg">
+                    <p class="description">Image 2: Center (Reference)</p>
+                </div>
+                <div class="image-container">
+                    <img src="../data/image3.jpg">
+                    <p class="description">Image 3: Right</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- part a: steps -->
+        <section class="section">
+            <h2>Step-by-Step Process for Part A</h2>
+            
+            <!-- step 1: correspondence -->
+            <section class="section">
+                <h3>1. Correspondence Point Selection</h3>
+                <p>The first step in panorama creation is to identify corresponding points between overlapping images. 
+                    These points serve as key landmarks that guide the alignment process.</p>
+                <p>Using an interactive tool, I manually selected <strong>eight</strong> corresponding points between Image 1 and Image 2, 
+                    and between Image 3 and Image 2. These points typically include facial landmarks, edges, and corners to ensure accurate alignment.</p>
+                <p>The selected points are saved in a JSON file for reuse and to maintain consistency across different runs.</p>
+            
+                <!-- gallery -->
+                <div class="image-gallery">
+                    <div class="image-container">
+                        <img src="../data/correspondences_image1_image2.png">
+                        <p class="description">Correspondence Points between Image 1 and Image 2</p>
+                    </div>
+                    
+                    <div class="image-container">
+                        <img src="../data/correspondences_image2_image3.png">
+                        <p class="description">Correspondence Points between Image 2 and Image 3</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- step 2: homography -->
+            <section class="section">
+                <h3>2. Homography Computation</h3>
+                <p>With the correspondence points identified, the next step is to compute the homography matrices that map points from one image to another. 
+                    Homography is a transformation that maps the perspective of one image to another, allowing for proper alignment.</p>
+                <p>This project implements the Direct Linear Transformation (DLT) algorithm manually through the <code>computeH</code> function. 
+                    The <code>computeH</code> function takes in two sets of corresponding points and constructs a system of linear equations to solve for the homography matrix. 
+                    By performing Singular Value Decomposition (SVD) on the constructed matrix, the function identifies the homography that best aligns the source points to the target points.</p>
+                <p>Two homographies are computed:</p>
+                <ul>
+                    <li><strong>H<sub>1to2</sub></strong>: Maps Image 1 to Image 2</li>
+                    <li><strong>H<sub>3to2</sub></strong>: Maps Image 3 to Image 2</li>
+                </ul>
+                <p>These homographies are essential for warping the images so that they align perfectly with the reference image (Image 2).</p>
+                
+                <!-- gallery -->
+                <div class="image-gallery">
+                    <div class="image-container">
+                        <img src="../data/transformation_image1.png">
+                        <p class="description">Homography H<sub>1to2</sub>: Image 1 → Image 2</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/transformation_image3.png">
+                        <p class="description">Homography H<sub>3to2</sub>: Image 3 → Image 2</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- step 3: warping -->
+            <section class="section">
+                <h3>3. Image Warping</h3>
+                <p>Using the computed homographies, each image is warped to align with the reference image (Image 2). 
+                    This involves transforming the perspective of Image 1 and Image 3 so that their overlapping regions match those of Image 2.</p>
+                <p>The warping process is implemented manually through the <code>warpImage</code> function. 
+                    This function performs inverse mapping, where each pixel in the panorama canvas is mapped back to the source image using the inverse of the homography matrix. 
+                    This method ensures accurate pixel alignment and allows for precise control over the warping process.</p>
+                <p>The <code>warpImage</code> function handles necessary offsets to manage negative coordinates and ensure that all images fit within the panorama canvas. 
+                    By iterating over each pixel in the output panorama, the function determines the corresponding source pixel and assigns the appropriate color values.</p>
+                
+                <!-- gallery -->
+                <div class="image-gallery">
+                    <div class="image-container">
+                        <img src="../data/warped_image1.png">
+                        <p class="description">Warped Image 1 aligned to Image 2</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/warped_image3.png">
+                        <p class="description">Warped Image 3 aligned to Image 2</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- step 4: panorama size -->
+            <section class="section">
+                <h3>4. Panorama Size Computation</h3>
+                <p>Before blending the warped images, it's crucial to determine the size of the panorama canvas. 
+                    This ensures that all images fit perfectly without any cropping or excessive empty space.</p>
+                <p>The <code>pano_size</code> function calculates the transformed corners of each image after warping and determines the minimum and maximum extents. 
+                    These calculations provide the required panorama dimensions and necessary offsets to translate images appropriately.</p>
+                <p>By aggregating the transformed corners, the function identifies the overall boundaries of the panorama, accounting for all three images. 
+                    This step is vital for setting up the canvas on which the final mosaic will be created.</p>
+                
+                <!-- gallery -->
+                <div class="image-gallery">
+                    <div class="image-container">
+                        <img src="../data/panorama_size_computation.png">
+                        <p class="description">Panorama Size and Offsets</p>
+                    </div>
+                </div>
+                
+                <!-- credit -->
+                <p class="credit">credit to my housemate for helping with this visualization.</p>
+            </section>
+            
+            <!-- step 5: blending -->
+            <section class="section">
+                <h3>5. Image Blending</h3>
+                <p>Once all images are warped and aligned on the panorama canvas, the final step is to blend them seamlessly. 
+                    This is achieved using feather blending, which smoothly transitions overlapping regions to minimize visible seams.</p>
+                <p>The <code>blend_imgs</code> function employs feathering masks created by the <code>feather_mask</code> function. 
+                    These masks are based on the distance of each pixel from the image borders, ensuring that pixels closer to the center have higher weights. 
+                    By applying these masks, the blending process reduces abrupt changes in pixel intensities, resulting in a cohesive and visually appealing panorama.</p>
+                <p>The blending process involves iterating over each warped image, applying the feathering mask, and accumulating the weighted pixel values. 
+                    The final panorama is obtained by normalizing the accumulated values to maintain proper color intensities.</p>
+                
+                <!-- gallery -->
+                <div class="image-gallery">
+                    <div class="image-container">
+                        <img src="../data/final_mosaic.png">
+                        <p class="description">Final Blended Mosaic Panorama</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- part a: additional examples -->
+            <section class="section">
+                <h2>Part A: Additional Examples</h2>
+                
+                <!-- additional success -->
+                <section class="section">
+                    <h3>Additional Mosaics</h3>
+                    <p>Here are two additional mosaics created using different sets of images and correspondence points:</p>
+                    
+                    <!-- gallery -->
+                    <div class="image-gallery">
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/image1.jpg">
+                            <p class="description">Image 1 (Ex. 2)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/image2.jpg">
+                            <p class="description">Image 2 (Ex. 2)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/image3.jpg">
+                            <p class="description">Image 3 (Ex. 2)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/correspondences_image1_image2.png">
+                            <p class="description">Correspondence Points between Image 1 and Image 2 (Ex. 2)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/correspondences_image3_image2.png">
+                            <p class="description">Correspondence Points between Image 3 and Image 2 (Ex. 2)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/transformation_image1.png">
+                            <p class="description">Homography H<sub>1to2</sub> (Ex. 2): Image 1 → Image 2</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/part A success 1/transformation_image3.png">
+                            <p class="description">Homography H<sub>3to2</sub> (Ex. 2): Image 3 → Image 2</p>
+                        </div>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/part A success 1/final_mosaic.png">
+                        <p class="description">Final Mosaic (Ex. 2)</p>
+                    </div>
+                </section>
+                
+                <!-- failure case -->
+                <section class="section">
+                    <h3>"Failure" Case</h3>
+                    <p>In this "failure" case, the correspondence points were correctly selected, and the process occurred correctly -- however, the actual photos taken
+                        did not have enough perspective overlap, resulting in a successfully executed stitch. Albeit, a difficult one to look at.
+                    </p>
+                    
+                    <!-- gallery -->
+                    <div class="image-gallery">
+                        <div class="image-container">
+                            <img src="../data/for site/failure case 1/correspondences_image1_image2.png">
+                            <p class="description">Correspondence Points between Image 1 and Image 2 (Ex. 3)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/failure case 1/correspondences_image3_image2.png">
+                            <p class="description">Correspondence Points between Image 2 and Image 3 (Ex. 3)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/failure case 1/failure case 1.png">
+                            <p class="description">Final Mosaic (Ex. 3)</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/failure case 1/transformation_image1.png">
+                            <p class="description">Homography H<sub>1to2</sub> (Ex. 3): Image 1 → Image 2</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/failure case 1/transformation_image3.png">
+                            <p class="description">Homography H<sub>3to2</sub> (Ex. 3): Image 3 → Image 2</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- conclusion part a -->
+            <section class="section">
+                <h2>Takeaways for Part A</h2>
+                <p>This project successfully demonstrates the creation of a seamless panorama by stitching multiple 
+                    images using custom functions like <code>computeH</code> and <code>warpImage</code>. By 
+                    manually handling homography computations and image warping, I gained a deeper understanding 
+                    of image alignment and transformation techniques, which enhances my post-processing workflows.</p>
+                
+                <p>As someone doing freelance photography as a hobby, these skills have helped give me a way to 
+                    capture and present expansive landscapes and immersive scenes in a different way. 
+                    Understanding the mechanics behind image stitching allows me to achieve precise alignment 
+                    and seamless blending in my photography, enriching the visual quality of my hobbyist 
+                    projects and expanding my creative capabilities. It's been lots of fun.</p>
+            </section>
+            
+            <!-- part b: feature matching -->
+            <section class="section">
+                <h2>Part B: Feature Matching for Autostitching</h2>
+            </section>
+
+            <!-- part b: steps -->
+            <section class="section">
+                <h2>Step-by-Step Process for Part B</h2>
+                
+                <!-- overview -->
+                <section class="section">
+                    <h3>Overview of Major Functions and Configurations</h3>
+                    <p>In Part B, the focus shifts to automating the panorama creation process through feature matching and homography computation. 
+                        The following major functions and configurations were implemented:</p>
+                    
+                    <ul>
+                        <li><strong>harris_corners1()</strong> & <strong>harris_corners2():</strong> detects corner features using Harris detector with edge discarding and thresholding.</li>
+                        <li><strong>extract_features:</strong> extracts rotation-invariant feature descriptors from keypoints.</li>
+                        <li><strong>match_features_ratio_test:</strong> matches descriptors using Lowe's Ratio Test to filter unreliable matches.</li>
+                        <li><strong>computeH_ransac:</strong> computes homography matrices using RANSAC for robust estimation.</li>
+                        <li><strong>blend_imgs:</strong> blends warped images into the final mosaic using feather blending.</li>
+                    </ul>
+                    
+                    <p>Additionally, three distinct configuration settings allow users to select processing modes based on their needs:</p>
+                    
+                    <ul>
+                        <li><strong>Configuration 1:</strong> basic detection and matching with default parameters.</li>
+                        <li><strong>Configuration 2:</strong> enhanced detection with stricter matching thresholds.</li>
+                        <li><strong>Configuration 3:</strong> advanced feature extraction with multi-scale analysis.</li>
+                    </ul>
+                    
+                    <p>This setup provides flexibility and ensures optimal performance across different scenarios as the configurations allow the user to
+                        pick between different preset settings of threshold levels, # of corners, and iteration amounts.
+                    </p>
+                </section>
+                
+                <!-- step 1: detect corners -->
+                <section class="section">
+                    <h3>1. Detecting Corner Features in an Image</h3>
+                    <p>I utilized the Harris corner detector to identify potential keypoints in each image. The <code>harris_corners1()</code> and <code>harris_corners2()</code> functions manage corner detection with edge discarding and thresholding based on the selected configuration mode. This step is crucial for locating points in the image with significant intensity changes, which serve as reliable features for matching.</p>
+                    
+                    <!-- gallery -->
+                    <div class="image-gallery">
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/im1_harris_corners.png">
+                            <p class="description">Harris Corners in Image 1</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/im2_harris_corners.png">
+                            <p class="description">Harris Corners in Image 2</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/im3_harris_corners.png">
+                            <p class="description">Harris Corners in Image 3</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- step 2: anms -->
+                <section class="section">
+                    <h3>2. Adaptive Non-Maximal Suppression (ANMS)</h3>
+                    <p>After detecting the initial Harris corners, I applied Adaptive Non-Maximal Suppression (ANMS) to retain the most prominent and well-distributed keypoints. ANMS helps in reducing redundancy by ensuring that keypoints are spread out across the image, enhancing the robustness of feature matching.</p>
+                        
+                        <!-- gallery -->
+                        <div class="image-gallery">
+                            <div class="image-container">
+                                <img src="../data/for site/anms_corners_image1.png">
+                                <p class="description">ANMS Corners in Image 1</p>
+                            </div>
+                            <div class="image-container">
+                                <img src="../data/for site/anms_corners_image2.png">
+                                <p class="description">ANMS Corners in Image 2</p>
+                            </div>
+                            <div class="image-container">
+                                <img src="../data/for site/anms_corners_image3.png">
+                                <p class="description">ANMS Corners in Image 3</p>
+                            </div>
+                        </div>
+                </section>
+
+                <!-- step 3: feature matching -->
+                <section class="section">
+                    <h3>3. Feature Matching</h3>
+                    <p>For each detected corner, I extracted feature descriptors using the <code>extract_features()</code> function. 
+                        These descriptors are normalized patches surrounding each keypoint, capturing local image information that remains consistent despite changes in scale and orientation. 
+                        The robustness helps in having accurate feature matching across different images.</p>
+
+                    <p>I employed Lowe's Ratio Test, implemented in the <code>lowes()</code> function, to match feature descriptors between image pairs. 
+                        This test involves comparing the distances between descriptors and accepting matches that meet a predefined ratio threshold. 
+                        The ratio test effectively filters out ambiguous matches, retaining only those that are most likely to be correct correspondences.</p>
+                    
+                    <!-- gallery -->
+                    <div class="image-gallery">
+                        <div class="image-container">
+                            <img src="../data/for site/descriptors1.png">
+                            <p class="description">Image 1 Descriptors</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/descriptors2.png">
+                            <p class="description">Image 2 Descriptors</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/descriptors3.png">
+                            <p class="description">Image 3 Descriptors</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/final_matches_im12.png">
+                            <p class="description">Feature Matches between Image 1 and Image 2</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/final_matches_im32.png">
+                            <p class="description">Feature Matches between Image 3 and Image 2</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- step 4: homography ransac -->
+                <section class="section">
+                    <h3>4. Using RANSAC to Compute a Homography</h3>
+                    <p>With the matched features in hand, I computed the homography matrices using the RANSAC algorithm via the <code>computeH_ransac</code> function. 
+                        RANSAC iteratively selects random subsets of matches to estimate the homography, identifying the model that best fits the majority of correspondences (inliers) while excluding outliers. 
+                        This robust estimation ensures that the resulting homography accurately aligns the images despite the presence of erroneous matches.</p>
+                    
+                    <!-- gallery -->
+                    <div class="image-gallery">
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/match_verification_im12.png">
+                            <p class="description">Match Verification between Image 1 and Image 2</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/match_verification_im32.png">
+                            <p class="description">Match Verification between Image 3 and Image 2</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 1/final_mosaic.png">
+                            <p class="description">Final Mosaic</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- step 5: produce mosaic -->
+                <section class="section">
+                    <h3>5. Producing a Mosaic</h3>
+                    <p>Using the computed homographies, I warped and blended images to produce automatic mosaics. 
+                        This step is essentially the same as with Part A (warping, panorama size computation, etc.) but utliizes the new values
+                    that we have attained through 4B. </p>
+                    
+
+                    Below are examples of the three configuration settings working on a single set of images:
+                    <!-- gallery -->
+                    <div class="image-gallery">
+                        <div class="image-container">
+                            <img src="../data/for site/success 2/final_mosaic_lvl1.png">
+                            <p class="description">[FAILURE] Final Mosaic Level 1</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 2/final_mosaic_lvl2.png">
+                            <p class="description">Final Mosaic Level 2 </p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 2/final_mosaic_lvl3.png">
+                            <p class="description">Final Mosaic Level 3</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="../data/for site/success 2/final_mosaic_part_A.png">
+                            <p class="description">Final Mosaic Part A Example</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            
+            <!-- part b: additional examples -->
+            <section class="section">
+                <h2>Part B: Additional Examples</h2>
+                <p>To further demonstrate the effectiveness of the automatic stitching process, here are two additional mosaics created using different configurations and image sets:</p>
+                
+                <!-- gallery -->
+                <div class="image-gallery">
+                    <div class="image-container">
+                        <img src="../data/for site/semi-failure case 2/anms_corners_image1.png" alt="ANMS Corners - Image 1">
+                        <p class="description">ANMS Corners - Image 1 (Ex. 2)</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/semi-failure case 2/anms_corners_image2.png" alt="ANMS Corners - Image 2">
+                        <p class="description">ANMS Corners - Image 2 (Ex. 2)</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/semi-failure case 2/anms_corners_image3.png" alt="ANMS Corners - Image 3">
+                        <p class="description">ANMS Corners - Image 3 (Ex. 2)</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/semi-failure case 2/mosaic_auto.jpg" alt="Final Mosaic - Level 2 Config">
+                        <p class="description">Final Mosaic - Level 2 Config (Ex. 2)</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/success 2/final_mosaic_lvl1.png">
+                        <p class="description">[FAILURE] Final Mosaic - Level 1 Config (Ex. 3a)</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/success 2/final_mosaic_lvl2.png">
+                        <p class="description">Final Mosaic - Level 2 Config (Ex. 3b)</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="../data/for site/success 2/final_mosaic_lvl3.png">
+                        <p class="description">Final Mosaic - Level 3 Config (Ex. 3c)</p>
+                    </div>
+
+                </div>
+            </section>
+            
+            <!-- conclusion part b -->
+            <section class="section">
+                <h2>Takeaways for Part B</h2>
+                <p>Feature matching in Part B was particularly interesting to me as it demonstrated 
+                    the precision and effectiveness of algorithms in aligning images seamlessly. 
+                    By implementing automatic feature matching and homography computation, 
+                    the process showcased how computer vision techniques can accurately 
+                    identify points that overlap between images. This enhances the efficiency and 
+                    scalability of creating mosaics by a lot -- and observing the integration of 
+                    feature matching has helped in my understanding of advanced image processing 
+                    methods in practical settings.</p>
+            </section>
+        </main>
+    </body>
+</html>
