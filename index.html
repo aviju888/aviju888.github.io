@@ -3,144 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180 Projects</title>
+    <title>Computer Vision Projects</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            background: #f5f5f5;
             color: #333;
+            background-color: #fafafa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         header {
-            background: #ffffff;
-            color: #333;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 4px solid #e0e0e0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background: white;
+            padding: 40px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            color: #007bff;
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .author {
+            text-align: center;
+            color: #34495e;
+            font-weight: 500;
         }
 
         main {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 60px 0;
         }
 
-        h2 {
-            font-size: 2.2em;
-            color: #333;
-            border-bottom: 3px solid #007bff;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-
-        .project-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e1e8ed;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .project-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .project-description {
+            color: #5a6c7d;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
         .project-link {
-            display: block;
-            text-align: center;
-            padding: 20px;
-            background-color: #fff;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            width: 200px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .project-link h3 {
-            margin-bottom: 10px;
-            color: #007bff;
-        }
-
-        .project-link p {
-            color: #555;
-            font-size: 1em;
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
         }
 
         .project-link:hover {
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-            transform: scale(1.05);
+            background: #2980b9;
         }
 
-        @media (max-width: 600px) {
-            .project-link {
-                width: 100%;
-                max-width: 300px;
-            }
+        .final-project .project-number {
+            background: #e74c3c;
+        }
+
+        .final-project .project-link {
+            background: #e74c3c;
+        }
+
+        .final-project .project-link:hover {
+            background: #c0392b;
         }
 
         footer {
+            background: white;
+            padding: 30px 0;
+            border-top: 1px solid #e1e8ed;
             text-align: center;
-            padding: 20px;
-            background-color: #fff;
-            border-top: 4px solid #e0e0e0;
-            color: #555;
-            font-size: 1em;
-            margin-top: 50px;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .project-card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-
     <header>
-        <h1>CS180: Projects</h1>
+        <div class="container">
+            <h1>Computer Vision Projects</h1>
+            <p class="subtitle">Exploring Image Processing, Computer Vision, and Machine Learning</p>
+            <p class="author">by Adriel Vijuan</p>
+        </div>
     </header>
 
     <main>
-        <section>
-            <h2>My Projects</h2>
-            <div class="project-links">
-                <a href="old_1/web/proj1.html" class="project-link">
-                    <h3>Project #1</h3>
-                    <p>Colorizing the Prokudin-Gorskii Photo Collection</p>
-                </a>
-                <a href="old_1/web/proj2.html" class="project-link">
-                    <h3>Project #2</h3>
-                    <p>Fun with Filters and Frequencies</p>
-                </a>
-                <a href="old_1/web/proj3.html" class="project-link">
-                    <h3>Project #3</h3>
-                    <p>Face Morphing</p>
-                </a>
-                <a href="old_1/web/proj4.html" class="project-link">
-                    <h3>Project #4</h3>
-                    <p>Stitching Photo Mosaics (Panoramas)</p>
-                </a>
-                <a href="old_1/web/proj5.html" class="project-link">
-                    <h3>Project #5</h3>
-                    <p>Diffusion Models</p>
-                </a>
-                <a href="old_1/web/proj6_final1.html" class="project-link">
-                    <h3>Final Project (pt.1)</h3>
-                    <p>HDR Images</p>
-                </a>
-                <a href="old_1/web/proj6_final2.html" class="project-link">
-                    <h3>Final Project (pt.2)</h3>
-                    <p>Light Field Camera</p>
-                </a>
+        <div class="container">
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-number">Project 1</div>
+                    <h2 class="project-title">Colorizing the Prokudin-Gorskii Photo Collection</h2>
+                    <p class="project-description">
+                        This project focuses on colorizing historical black-and-white images by aligning RGB color channels. 
+                        The approach involves splitting film strips into red, blue, and green channels, then using alignment 
+                        techniques including normalization, pyramid-based methods, and white balancing to create realistic 
+                        colorized versions of the original photographs.
+                    </p>
+                    <a href="old_1/web/proj1.html" class="project-link">View Project</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-number">Project 2</div>
+                    <h2 class="project-title">Fun with Filters and Frequencies</h2>
+                    <p class="project-description">
+                        Exploring image processing through various filters and frequency domain techniques. This project 
+                        covers edge detection, image sharpening, hybrid images, and multi-resolution blending using 
+                        Gaussian and Laplacian pyramids. Learn how different frequency components affect image perception 
+                        and how to manipulate them for creative effects.
+                    </p>
+                    <a href="old_1/web/proj2.html" class="project-link">View Project</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-number">Project 3</div>
+                    <h2 class="project-title">Face Morphing</h2>
+                    <p class="project-description">
+                        Implementation of image morphing techniques to create seamless transitions between images. 
+                        The project involves establishing correspondence points, applying affine transformations, 
+                        and generating intermediate frames. Includes creating mid-way faces, morph sequences, 
+                        and computing mean faces from population data.
+                    </p>
+                    <a href="old_1/web/proj3.html" class="project-link">View Project</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-number">Project 4</div>
+                    <h2 class="project-title">Stitching Photo Mosaics (Panoramas)</h2>
+                    <p class="project-description">
+                        Creating panoramic images by stitching multiple photographs together. This project explores 
+                        feature detection, image matching, homography estimation, and image warping techniques. 
+                        Learn how to automatically detect and match features across images to create seamless 
+                        panoramic compositions from multiple viewpoints.
+                    </p>
+                    <a href="old_1/web/proj4.html" class="project-link">View Project</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-number">Project 5</div>
+                    <h2 class="project-title">Diffusion Models</h2>
+                    <p class="project-description">
+                        Exploring diffusion models through sampling, denoising, and translation techniques. 
+                        This project covers the forward process of adding Gaussian noise, classical denoising 
+                        methods, and model-based approaches. Implement and compare different denoising strategies 
+                        while understanding the principles behind modern generative AI models.
+                    </p>
+                    <a href="old_1/web/proj5.html" class="project-link">View Project</a>
+                </div>
+
+                <div class="project-card final-project">
+                    <div class="project-number">Final Project Part 1</div>
+                    <h2 class="project-title">HDR Images</h2>
+                    <p class="project-description">
+                        High Dynamic Range (HDR) imaging techniques for capturing and processing images with 
+                        extended luminance ranges. This project covers exposure bracketing, tone mapping, 
+                        and methods for combining multiple exposures to create images that better represent 
+                        the full range of light in a scene, from deep shadows to bright highlights.
+                    </p>
+                    <a href="old_1/web/proj6_final1.html" class="project-link">View Project</a>
+                </div>
+
+                <div class="project-card final-project">
+                    <div class="project-number">Final Project Part 2</div>
+                    <h2 class="project-title">Light Field Camera</h2>
+                    <p class="project-description">
+                        Exploring light field imaging capabilities through depth refocusing and aperture 
+                        adjustment techniques. Using multiple images captured over a grid orthogonal to 
+                        the optical axis, this project recreates complex photographic effects through 
+                        computational operations like shifting and averaging, demonstrating the power 
+                        of computational photography.
+                    </p>
+                    <a href="old_1/web/proj6_final2.html" class="project-link">View Project</a>
+                </div>
             </div>
-        </section>
+        </div>
     </main>
 
     <footer>
-        <p>Created by Adriel Vijuan for CS180 - 2024</p>
+        <div class="container">
+            <p>&copy; 2024 Adriel Vijuan. All rights reserved.</p>
+        </div>
     </footer>
-
 </body>
 </html>
