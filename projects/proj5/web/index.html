@@ -9,8 +9,6 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 </head>
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-
     <header>
         <h1>CS180: Project 5A</h1>
         <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
@@ -18,18 +16,10 @@
         <p>Exploring Diffusion Models through Sampling, Denoising, and Translation</p> 
     </header>
 
-    <nav class="breadcrumb">
-        <a href="../../../index.html">Home</a>
-        <span>/</span>
-        <a href="../../../index.html">Projects</a>
-        <span>/</span>
-        <span>Project #5</span>
-    </nav>
-
     <main id="main-content">
 
         <!-- Part 0: Setup -->
-        <section>
+        <section class="section">
             <h2>Part 0. Setup</h2>
             <p>
                 I began the project by setting up the development environment, 
@@ -40,153 +30,167 @@
                   fixed seed to ensure reproducibility. Below are three 
                   examples of test-generated images based on specific prompts:
             </p>
-            <div class="image-container">
-                <img src="images/PROJ5/0_1.png" alt="Project Setup">
-                <p class="description">an oil painting of a snowy mountain village</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/0_2.png" alt="Project Setup">
-                <p class="description">a man wearing a hat</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/0_3.png" alt="Project Setup">
-                <p class="description">a rocket ship</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/PROJ5/0_1.png" alt="Project Setup">
+                    <p class="description">an oil painting of a snowy mountain village</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/0_2.png" alt="Project Setup">
+                    <p class="description">a man wearing a hat</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/0_3.png" alt="Project Setup">
+                    <p class="description">a rocket ship</p>
+                </div>
             </div>
         </section>
 
         <!-- Part 1.1: Forward Process -->
-        <section>
+        <section class="section">
             <h2>1.1 Forward Process</h2>
             <p>
                 I implemented the forward process to add Gaussian noise to an image based on the cumulative product of noise scales. 
                 The function <code>apply_noise</code> computes the noisy image for various timesteps, showing how noise progressively degrades the original image.
             </p>
-            <div class="image-container">
-                <img src="images/PROJ5/1_1 - step 250.png" alt="Forward Process - Timestep 100">
-                <p class="description">Timestep 100 - Initial noise</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_1 - step 500.png" alt="Forward Process - Timestep 500">
-                <p class="description">Timestep 500 - Moderate noise</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_1 - step 750.png" alt="Forward Process - Timestep 750">
-                <p class="description">Timestep 750 - Heavy noise</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/PROJ5/1_1 - step 250.png" alt="Forward Process - Timestep 250">
+                    <p class="description">Timestep 250 - Initial noise</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_1 - step 500.png" alt="Forward Process - Timestep 500">
+                    <p class="description">Timestep 500 - Moderate noise</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_1 - step 750.png" alt="Forward Process - Timestep 750">
+                    <p class="description">Timestep 750 - Heavy noise</p>
+                </div>
             </div>
         </section>
 
         <!-- Part 1.2: Classical Denoising -->
-        <section>
+        <section class="section">
             <h2>1.2 Classical Denoising</h2>
             <p>
                 Gaussian blur was used as a baseline to compare the effectiveness of classical denoising with model-based approaches.
                 The kernel size and sigma were carefully tuned to remove high-frequency noise while retaining image details.
             </p>
-            <div class="image-container">
-                <img src="images/PROJ5/1_2 - step 250.png" alt="Classical Denoising - Timestep 250">
-                <p class="description">Gaussian Blur - Timestep 250</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_2 - step 500.png" alt="Classical Denoising - Timestep 500">
-                <p class="description">Gaussian Blur - Timestep 500</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_2 - step 750.png" alt="Classical Denoising - Timestep 750">
-                <p class="description">Gaussian Blur - Timestep 750</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/PROJ5/1_2 - step 250.png" alt="Classical Denoising - Timestep 250">
+                    <p class="description">Gaussian Blur - Timestep 250</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_2 - step 500.png" alt="Classical Denoising - Timestep 500">
+                    <p class="description">Gaussian Blur - Timestep 500</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_2 - step 750.png" alt="Classical Denoising - Timestep 750">
+                    <p class="description">Gaussian Blur - Timestep 750</p>
+                </div>
             </div>
         </section>
 
         <!-- Part 1.3: One-Step Denoising -->
-        <section>
+        <section class="section">
             <h2>1.3 One-Step Denoising</h2>
             <p>
                 Using a trained UNet, I implemented one-step denoising by estimating and removing the noise from a noisy image. 
                 The function <code>predict_noise</code> accurately predicts the added noise at a given timestep.
             </p>
-            <div class="image-container">
-                <img src="images/PROJ5/1_3 - step 250.png" alt="One-Step Denoising Result - Step 250">
-                <p class="description">Result of one-step denoising - step 250</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_3 - step 500.png" alt="One-Step Denoising Result - Step 500">
-                <p class="description">step 500</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_3 - step 750.png" alt="One-Step Denoising Result - Step 750">
-                <p class="description">step 750</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/PROJ5/1_3 - step 250.png" alt="One-Step Denoising Result - Step 250">
+                    <p class="description">Result of one-step denoising - step 250</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_3 - step 500.png" alt="One-Step Denoising Result - Step 500">
+                    <p class="description">Step 500</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_3 - step 750.png" alt="One-Step Denoising Result - Step 750">
+                    <p class="description">Step 750</p>
+                </div>
             </div>
         </section>
 
         <!-- Part 1.4: Iterative Denoising -->
-        <section>
+        <section class="section">
             <h2>1.4 Iterative Denoising</h2>
             <p>
                 This step refines the process by repeatedly estimating and removing noise over multiple timesteps. 
                 Each iteration uses the UNet's predictions to guide the denoising process.
             </p>
-            <div class="image-container">
-                <img src="images/PROJ5/1_4 - timestep 690 step 0.png" alt="Timestep 690 - Initial">
-                <p class="description">Initial noisy image (timestep 690)</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_4 - timestep 690 step 10.png" alt="Timestep 690 - Step 10">
-                <p class="description">Intermediate step 10</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_4 - timestep 690 step 30.png" alt="Timestep 690 - Step 30">
-                <p class="description">Intermediate step 30</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_4 - timestep 690 clean.png" alt="Timestep 690 - Clean">
-                <p class="description">Fully denoised image at timestep 690</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/PROJ5/1_4 - timestep 690 step 0.png" alt="Timestep 690 - Initial">
+                    <p class="description">Initial noisy image (timestep 690)</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_4 - timestep 690 step 10.png" alt="Timestep 690 - Step 10">
+                    <p class="description">Intermediate step 10</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_4 - timestep 690 step 30.png" alt="Timestep 690 - Step 30">
+                    <p class="description">Intermediate step 30</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_4 - timestep 690 clean.png" alt="Timestep 690 - Clean">
+                    <p class="description">Fully denoised image</p>
+                </div>
             </div>
         </section>
 
         <!-- Part 1.5: Diffusion Model Sampling -->
-        <section>
+        <section class="section">
             <h2>1.5 Diffusion Model Sampling</h2>
             <p>
                 I initialized random noise and iteratively denoised it using the trained UNet to generate synthetic images from scratch. This method demonstrates the ability to model realistic images purely from noise.
             </p>
-            <div class="image-container">
-                <img src="images/proj5/1_5 - img1 done.png" alt="Sampling Step 0">
-                <p class="description">Sampling Step 0 - Random noise</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_5 - img1 step 10.png" alt="Sampling Step 10">
-                <p class="description">Sampling Step 10 - Intermediate result</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_5 - img1 step 20.png" alt="Sampling Step 20">
-                <p class="description">Sampling Step 20 - Improved details</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_5 - img1 step 30.png" alt="Sampling Step 30">
-                <p class="description">Sampling Step 30 - Final output</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/proj5/1_5 - img1 done.png" alt="Sampling Step 0">
+                    <p class="description">Step 0 - Random noise</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_5 - img1 step 10.png" alt="Sampling Step 10">
+                    <p class="description">Step 10 - Intermediate</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_5 - img1 step 20.png" alt="Sampling Step 20">
+                    <p class="description">Step 20 - Improved details</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_5 - img1 step 30.png" alt="Sampling Step 30">
+                    <p class="description">Step 30 - Final output</p>
+                </div>
             </div>
         </section>
 
         <!-- Part 1.6: Classifier-Free Guidance (CFG) -->
-        <section>
+        <section class="section">
             <h2>1.6 Classifier-Free Guidance (CFG)</h2>
             <p>
                 CFG modifies the sampling process by incorporating conditional and unconditional noise estimates, blending them to achieve guided image generation. Adjusting the guidance scale impacts the balance between realism and adherence to prompts.
             </p>
-            <div class="image-container">
-                <img src="images/PROJ5/1_6 - img1.png" alt="CFG Sample 1">
-                <p class="description">Guided generation with CFG - Sample 1</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_6 - img2.png" alt="CFG Sample 2">
-                <p class="description">Guided generation with CFG - Sample 2</p>
-            </div>
-            <div class="image-container">
-                <img src="images/PROJ5/1_6 - img3.png" alt="CFG Sample 3">
-                <p class="description">Guided generation with CFG - Sample 3</p>
+            <div class="image-gallery">
+                <div>
+                    <img src="images/PROJ5/1_6 - img1.png" alt="CFG Sample 1">
+                    <p class="description">CFG Sample 1</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_6 - img2.png" alt="CFG Sample 2">
+                    <p class="description">CFG Sample 2</p>
+                </div>
+                <div>
+                    <img src="images/PROJ5/1_6 - img3.png" alt="CFG Sample 3">
+                    <p class="description">CFG Sample 3</p>
+                </div>
             </div>
         </section>
 
-    <section>
+    <section class="section">
         <h2>1.7 Image-to-Image Translation</h2>
         
         <!-- Subsection 1.7.1 -->
@@ -196,43 +200,47 @@
         </p>
         
         <h4>Hand-Drawn Image</h4>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - drawing noise level 3.png" alt="Hand-Drawn - Noise Level 3">
-            <p class="description">Noise level 3</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - drawing noise level 5.png" alt="Hand-Drawn - Noise Level 5">
-            <p class="description">Noise level 5</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - drawing noise level 7.png" alt="Hand-Drawn - Noise Level 7">
-            <p class="description">Noise level 7</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - drawing noise level 10.png" alt="Hand-Drawn - Noise Level 10">
-            <p class="description">Noise level 10</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - drawing noise level 20.png" alt="Hand-Drawn - Noise Level 20">
-            <p class="description">Noise level 20</p>
+        <div class="image-gallery">
+            <div>
+                <img src="images/PROJ5/1_7_1 - drawing noise level 3.png" alt="Hand-Drawn - Noise Level 3">
+                <p class="description">Noise level 3</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - drawing noise level 5.png" alt="Hand-Drawn - Noise Level 5">
+                <p class="description">Noise level 5</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - drawing noise level 7.png" alt="Hand-Drawn - Noise Level 7">
+                <p class="description">Noise level 7</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - drawing noise level 10.png" alt="Hand-Drawn - Noise Level 10">
+                <p class="description">Noise level 10</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - drawing noise level 20.png" alt="Hand-Drawn - Noise Level 20">
+                <p class="description">Noise level 20</p>
+            </div>
         </div>
     
         <h4>Web Image</h4>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - noise level 1.png" alt="Web Image - Noise Level 1">
-            <p class="description">Noise level 1</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - noise level 5.png" alt="Web Image - Noise Level 5">
-            <p class="description">Noise level 5</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - noise level 10.png" alt="Web Image - Noise Level 10">
-            <p class="description">Noise level 10</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_1 - noise level 20.png" alt="Web Image - Noise Level 20">
-            <p class="description">Noise level 20</p>
+        <div class="image-gallery">
+            <div>
+                <img src="images/PROJ5/1_7_1 - noise level 1.png" alt="Web Image - Noise Level 1">
+                <p class="description">Noise level 1</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - noise level 5.png" alt="Web Image - Noise Level 5">
+                <p class="description">Noise level 5</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - noise level 10.png" alt="Web Image - Noise Level 10">
+                <p class="description">Noise level 10</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_1 - noise level 20.png" alt="Web Image - Noise Level 20">
+                <p class="description">Noise level 20</p>
+            </div>
         </div>
         
         <!-- Subsection 1.7.2 -->
@@ -240,21 +248,23 @@
         <p>
             I explored the inpainting technique, which involves reconstructing specific parts of an image while keeping the rest unchanged. By applying masks to designate "unknown" regions, I iteratively used the reverse diffusion process to accurately fill in the masked areas. This approach ensured that the unmasked parts of the image remained intact and consistent throughout the inpainting process.
         </p>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_2 - image1.png" alt="Inpainting Original Image">
-            <p class="description">Original Image</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_2 - image2.png" alt="Inpainting Mask">
-            <p class="description">Applied Mask</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_2 - image3.png" alt="Inpainting Result (Masked)">
-            <p class="description">Intermediate Result</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_2 - image4.png" alt="Final Inpainting Result">
-            <p class="description">Final Output</p>
+        <div class="image-gallery">
+            <div>
+                <img src="images/PROJ5/1_7_2 - image1.png" alt="Inpainting Original Image">
+                <p class="description">Original Image</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_2 - image2.png" alt="Inpainting Mask">
+                <p class="description">Applied Mask</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_2 - image3.png" alt="Inpainting Result (Masked)">
+                <p class="description">Intermediate Result</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_2 - image4.png" alt="Final Inpainting Result">
+                <p class="description">Final Output</p>
+            </div>
         </div>
         
         <!-- Subsection 1.7.3 -->
@@ -264,62 +274,63 @@
         </p>
     
         <h4>Example 1</h4>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_3 - image1 noise level 1.png" alt="Text Conditional - Noise Level 1">
-            <p class="description">Noise level 1</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_3 - image1 noise level 5.png" alt="Text Conditional - Noise Level 5">
-            <p class="description">Noise level 5</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_3 - image1 noise level 10.png" alt="Text Conditional - Noise Level 10">
-            <p class="description">Noise level 10</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_7_3 - image1 noise level 20.png" alt="Text Conditional - Noise Level 20">
-            <p class="description">Noise level 20</p>
+        <div class="image-gallery">
+            <div>
+                <img src="images/PROJ5/1_7_3 - image1 noise level 1.png" alt="Text Conditional - Noise Level 1">
+                <p class="description">Noise level 1</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_3 - image1 noise level 5.png" alt="Text Conditional - Noise Level 5">
+                <p class="description">Noise level 5</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_3 - image1 noise level 10.png" alt="Text Conditional - Noise Level 10">
+                <p class="description">Noise level 10</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_7_3 - image1 noise level 20.png" alt="Text Conditional - Noise Level 20">
+                <p class="description">Noise level 20</p>
+            </div>
         </div>
     </section>
 
     <!-- Part 1.8: Visual Anagrams -->
-    <section>
+    <section class="section">
         <h2>1.8 Visual Anagrams</h2>
         <p>
             I created visual anagrams by flipping images and averaging the noise estimates for both orientations. This innovative technique resulted in images that could be interpreted in two different ways depending on the viewing angle. By combining the noise patterns from the original and flipped versions, I was able to generate visually ambiguous images that offer dual interpretations, showcasing the creative potential of diffusion models.
         </p>
-        <div class="image-container">
-            <img src="images/PROJ5/1_8 - image1.png" alt="Visual Anagram - Original Orientation">
-            <p class="description">Old Man</p>
-        </div>
-        <div class="image-container">
-            <img src="images/PROJ5/1_8 - image2.png" alt="Visual Anagram - Flipped Orientation">
-            <p class="description">Campfire</p>
+        <div class="image-gallery">
+            <div>
+                <img src="images/PROJ5/1_8 - image1.png" alt="Visual Anagram - Original Orientation">
+                <p class="description">Old Man</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_8 - image2.png" alt="Visual Anagram - Flipped Orientation">
+                <p class="description">Campfire</p>
+            </div>
         </div>
     </section>
 
     <!-- Part 1.10: Hybrid Images -->
-    <section>
+    <section class="section">
         <h2>1.10 Hybrid Images</h2>
         <p>
             I experimented with creating hybrid images by blending high-frequency and low-frequency information from different sources. This approach resulted in visuals that appear ambiguous, changing their perception based on the viewer's distance. By applying lowpass filters to one image and highpass filters to another, I merged distinct visual elements into a single, cohesive image. This technique highlights the diffusion model's ability to manipulate and combine different frequency components to produce complex, detailed visuals.
         </p>
-        <h4>Example 1</h4>
-        <div class="image-container">
-            <img src="images/PROJ5/1_10 - image1.png" alt="Hybrid Image - Skull x Waterfall">
-            <p class="description">Skull x Waterfall</p>
-        </div>
-    
-        <h4>Example 2</h4>
-        <div class="image-container">
-            <img src="images/PROJ5/1_10 - image2.png" alt="Hybrid Image - Dog x Old Man">
-            <p class="description">Dog x Old Man</p>
-        </div>
-    
-        <h4>Example 3</h4>
-        <div class="image-container">
-            <img src="images/PROJ5/1_10 - image3.png" alt="Hybrid Image - Man Wearing Hat x Pencil">
-            <p class="description">Man Wearing Hat x Pencil (Failure)</p>
+        <div class="image-gallery">
+            <div>
+                <img src="images/PROJ5/1_10 - image1.png" alt="Hybrid Image - Skull x Waterfall">
+                <p class="description">Skull x Waterfall</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_10 - image2.png" alt="Hybrid Image - Dog x Old Man">
+                <p class="description">Dog x Old Man</p>
+            </div>
+            <div>
+                <img src="images/PROJ5/1_10 - image3.png" alt="Hybrid Image - Man Wearing Hat x Pencil">
+                <p class="description">Man Wearing Hat x Pencil (Failure)</p>
+            </div>
         </div>
     </section>
 
