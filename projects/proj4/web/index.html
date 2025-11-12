@@ -2,21 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS180: Project - Image Panorama Creation</title>
     <link rel="stylesheet" href="../../../style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../../../script.js" defer></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-
-    
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <header>
         <h1>CS180: Project 4</h1>
-        <h3><a href="../../index.html">by Adriel Vijuan</a></h3>
+        <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        <h3><a href="../../../index.html">by Adriel Vijuan</a></h3>
         <p>Stitching Photo Mosaics (Panoramas)</p> 
     </header>
 
-    <main>
+    <nav class="breadcrumb">
+        <a href="../../../index.html">Home</a>
+        <span>/</span>
+        <a href="../../../index.html">Projects</a>
+        <span>/</span>
+        <span>Project #4</span>
+    </nav>
+
+    <main id="main-content">
         <!-- part a: warping & mosaicing -->
         <section class="section">
             <h2>Part A: Image Warping and Mosaicing</h2>
