@@ -1,5 +1,5 @@
 // ============================================
-// CS180 Projects - Main JavaScript File
+// Portfolio - Main JavaScript File
 // ============================================
 
 // Dark Mode Toggle

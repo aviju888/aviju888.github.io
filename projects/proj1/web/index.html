@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180 Project #1</title>
+    <meta name="description" content="Automated colorization of historical Prokudin-Gorskii photographs using multi-scale alignment techniques.">
+    <meta name="keywords" content="computer vision, image processing, colorization, Prokudin-Gorskii, Python, FFT, Gaussian pyramid">
+    <title>Historical Photo Colorization - Adriel Vijuan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,21 +14,20 @@
 </head>
 <body>
     <header>
-        <h1>CS180: Project #1</h1>
+        <h1>Historical Photo Colorization</h1>
         <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-        <h3><a href="../../../index.html">by Adriel Vijuan</a></h3>
-        <p>Colorizing the <a href="https://www.loc.gov/collections/prokudin-gorskii/">Prokudin-Gorskii Photo Collection</a>.</p>
+        <p class="author-link"><a href="../../../index.html">Adriel Vijuan</a></p>
+        <p>Automated colorization of the <a href="https://www.loc.gov/collections/prokudin-gorskii/">Prokudin-Gorskii Photo Collection</a></p>
     </header>
 
     <main id="main-content">
         <!-- PROJECT OVERVIEW -->
         <section class="section flex-row-start">
             <div class="flex-item mr-20">
-                <h2>Project Overview</h2>
-                <p>This project focuses on colorizing the Prokudin-Gorskii photo collection by aligning the color channels of historical 
-                    black-and-white images. The original black-and-white images consist of film strips of three images, each taken of the same scene, but through a red, blue, 
-                    and green filter respectively.
-                    The approach I underwent combines these images into a colorized version and involves several key steps that will be broken down.</p>
+                <h2>Overview</h2>
+                <p>Historical black-and-white photographs often contain valuable color information encoded in separate RGB channel exposures. 
+                    This work implements an automated pipeline for aligning and combining these channels to reconstruct full-color images from 
+                    the Prokudin-Gorskii collection, using multi-scale alignment techniques to handle images of varying sizes.</p>
                 <!-- <ul>
                     <li><strong>Normalization:</strong> Normalizing pixel values to a common scale for consistency.</li>
                     <li><strong>Splitting:</strong> Dividing each image into RGB channels.</li>
@@ -49,16 +50,15 @@
         
         <!-- APPROACH BREAKDOWN -->
         <section class="section">
-            <h2>Approach Breakdown</h2>
+            <h2>Methodology</h2>
             
-            <h3>Configuration</h3>
-            <p>The configuration section of the code determines how image processing is handled based on user input:</p>
+            <h3>Implementation Details</h3>
+            <p>The implementation supports both single-image and batch processing modes:</p>
             <ul>
-                <li><strong><code>PROCESS_SINGLE_IMAGE</code></strong>: This variable allows the user to specify whether to process a single image or multiple images within a 
-                    directory. If set to <code>True</code>, the program will process only one image that is specified. If set to <code>False</code>, the program will process 
-                    all images in a given directory. This configuration provides flexibility for different processing needs.</li>
-                <li><strong>File Types:</strong> The program is designed to handle various image file formats, as specified by a configurable list of acceptable file 
-                    extensions. This ensures that the processing can be applied to different types of image files, depending on the requirements.</li>
+                <li><strong><code>PROCESS_SINGLE_IMAGE</code></strong>: Controls whether to process a single image or all images in a directory. 
+                    This provides flexibility for different processing needs.</li>
+                <li><strong>File Types:</strong> The implementation handles various image file formats through a configurable list of acceptable file 
+                    extensions, ensuring compatibility with different image types.</li>
             </ul>
 
             <h3>Alignment Methods</h3>
@@ -108,7 +108,7 @@
         <!-- RESULTS -->
         <section class="section">
             <h2>Results</h2>
-            <p>Results of the colorization process from the provided data folder for this project:</p>
+            <p>Results from the dataset:</p>
             
             <div class="image-gallery" id="gallery">
                 <!-- Images will be dynamically added here -->
@@ -149,7 +149,8 @@
                     img.style.height = 'auto';
                     
                     p.className = 'description';
-                    p.textContent = `Displacement vectors for ${file.name}: Green channel: ${file.green}, Red channel: ${file.red}`;
+                    const fileName = file.name.replace('.jpg', '').replace(/_/g, ' ');
+                    p.innerHTML = `${fileName.charAt(0).toUpperCase() + fileName.slice(1)} <span class="technical-detail">(G${file.green}, R${file.red})</span>`;
                     
                     div.appendChild(img);
                     div.appendChild(p);
@@ -164,11 +165,11 @@
         <!-- COMMENTARY -->
 <section class="section flex-row-start">
     <div class="flex-item mr-20">
-        <h2>Bells and Whistles</h2>
+        <h2>Additional Features</h2>
         
-        <p><strong>White Balance:</strong> In this project, a white balance function was implemented to correct color 
-            imbalances in the images -- thereby improving image quality overall. The function, <code>white_balance_white</code>, is based on a 
-            method discussed in lecture, which assumes that the brightest pixel in the image represents white.</p>
+        <p><strong>White Balance:</strong> A white balance function was implemented to correct color 
+            imbalances in the images, improving overall image quality. The function, <code>white_balance_white</code>, 
+            assumes that the brightest pixel in the image represents white, scaling color channels accordingly.</p>
 
         <ul>
             <li>The function determines the maximum intensity values for each color channel (red, green, 
@@ -196,8 +197,8 @@
         
         <!-- CUSTOM RESULTS -->
         <section class="section">
-            <h2>Custom Results</h2>
-            <p>Results of additional colorization processes, beyond the provided data for the project:</p>
+        <h2>Additional Examples</h2>
+        <p>Additional colorization results:</p>
             
             <div class="image-gallery" id="custom-gallery">
                 <!-- Images will be dynamically added here -->
@@ -228,7 +229,7 @@
                     img.style.height = 'auto';
                     
                     p.className = 'description';
-                    p.textContent = `Displacement vectors: Green channel: ${file.green}, Red channel: ${file.red}`;
+                    p.innerHTML = `Custom image ${file.name.replace('custom-', '').replace('.jpg', '')} <span class="technical-detail">(G${file.green}, R${file.red})</span>`;
                     
                     div.appendChild(img);
                     div.appendChild(p);
@@ -237,9 +238,9 @@
             });
         </script>
 
-    <!-- COMMENTARY -->
+    <!-- DISCUSSION -->
     <section class="section">
-        <h2>Commentary</h2>
+        <h2>Discussion</h2>
         
         <p>While many images have been successfully colorized, some show misalignment issues that need to be addressed. 
             For instance, discrepancies in alignment can be observed due to the scoring mechanism used, which did not 

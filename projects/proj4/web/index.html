@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180: Project - Image Panorama Creation</title>
+    <meta name="description" content="Automated panorama creation from multiple images using homography computation, image warping, and blending techniques.">
+    <meta name="keywords" content="computer vision, panorama, image stitching, homography, DLT, Python, OpenCV">
+    <title>Panoramic Image Stitching - Adriel Vijuan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,24 +15,20 @@
 </head>
 <body>
     <header>
-        <h1>CS180: Project 4</h1>
+        <h1>Panoramic Image Stitching</h1>
         <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-        <h3><a href="../../../index.html">by Adriel Vijuan</a></h3>
-        <p>Stitching Photo Mosaics (Panoramas)</p> 
+        <p class="author-link"><a href="../../../index.html">Adriel Vijuan</a></p>
+        <p>Automated panorama creation from multiple images</p> 
     </header>
 
     <main id="main-content">
-        <!-- part a: warping & mosaicing -->
-        <section class="section">
-            <h2>Part A: Image Warping and Mosaicing</h2>
-        </section>
         <!-- intro -->
         <section class="section">
             <h2>Introduction</h2>
-            <p>This project involves creating a seamless panorama by stitching together three overlapping images. 
+            <p>This work implements an automated pipeline for creating seamless panoramas by stitching together multiple overlapping images. 
                 The process includes selecting corresponding points between images, computing homographies, 
                 warping images to align them, and blending the warped images into a cohesive mosaic. 
-                The objective is to demonstrate image alignment techniques and advanced image processing 
+                The implementation demonstrates image alignment techniques and advanced image processing 
                 using Python.</p>
             
             <!-- gallery -->
@@ -50,14 +48,14 @@
             </div>
         </section>
         
-        <!-- part a: steps -->
+        <!-- methodology -->
         <section class="section">
-            <h2>Step-by-Step Process for Part A</h2>
+            <h2>Methodology</h2>
             
-            <!-- step 1: correspondence -->
+            <!-- correspondence -->
             <section class="section">
-                <h3>1. Correspondence Point Selection</h3>
-                <p>The first step in panorama creation is to identify corresponding points between overlapping images. 
+                <h3>Correspondence Point Selection</h3>
+                <p>Panorama creation begins by identifying corresponding points between overlapping images. 
                     These points serve as key landmarks that guide the alignment process.</p>
                 <p>Using an interactive tool, I manually selected <strong>eight</strong> corresponding points between Image 1 and Image 2, 
                     and between Image 3 and Image 2. These points typically include facial landmarks, edges, and corners to ensure accurate alignment.</p>
@@ -77,12 +75,12 @@
                 </div>
             </section>
             
-            <!-- step 2: homography -->
+            <!-- homography -->
             <section class="section">
-                <h3>2. Homography Computation</h3>
-                <p>With the correspondence points identified, the next step is to compute the homography matrices that map points from one image to another. 
+                <h3>Homography Computation</h3>
+                <p>With correspondence points identified, homography matrices are computed to map points from one image to another. 
                     Homography is a transformation that maps the perspective of one image to another, allowing for proper alignment.</p>
-                <p>This project implements the Direct Linear Transformation (DLT) algorithm manually through the <code>computeH</code> function. 
+                <p>The implementation uses the Direct Linear Transformation (DLT) algorithm through the <code>computeH</code> function. 
                     The <code>computeH</code> function takes in two sets of corresponding points and constructs a system of linear equations to solve for the homography matrix. 
                     By performing Singular Value Decomposition (SVD) on the constructed matrix, the function identifies the homography that best aligns the source points to the target points.</p>
                 <p>Two homographies are computed:</p>
@@ -105,9 +103,9 @@
                 </div>
             </section>
             
-            <!-- step 3: warping -->
+            <!-- warping -->
             <section class="section">
-                <h3>3. Image Warping</h3>
+                <h3>Image Warping</h3>
                 <p>Using the computed homographies, each image is warped to align with the reference image (Image 2). 
                     This involves transforming the perspective of Image 1 and Image 3 so that their overlapping regions match those of Image 2.</p>
                 <p>The warping process is implemented manually through the <code>warpImage</code> function. 
@@ -129,10 +127,10 @@
                 </div>
             </section>
             
-            <!-- step 4: panorama size -->
+            <!-- panorama size -->
             <section class="section">
-                <h3>4. Panorama Size Computation</h3>
-                <p>Before blending the warped images, it's crucial to determine the size of the panorama canvas. 
+                <h3>Panorama Size Computation</h3>
+                <p>Before blending the warped images, the panorama canvas size must be determined. 
                     This ensures that all images fit perfectly without any cropping or excessive empty space.</p>
                 <p>The <code>pano_size</code> function calculates the transformed corners of each image after warping and determines the minimum and maximum extents. 
                     These calculations provide the required panorama dimensions and necessary offsets to translate images appropriately.</p>
@@ -173,7 +171,7 @@
             
             <!-- part a: additional examples -->
             <section class="section">
-                <h2>Part A: Additional Examples</h2>
+                <h2>Additional Examples</h2>
                 
                 <!-- additional success -->
                 <section class="section">
@@ -252,32 +250,21 @@
 
             <!-- conclusion part a -->
             <section class="section">
-                <h2>Takeaways for Part A</h2>
-                <p>This project successfully demonstrates the creation of a seamless panorama by stitching multiple 
+                <h2>Discussion</h2>
+                <p>This work successfully demonstrates the creation of seamless panoramas by stitching multiple 
                     images using custom functions like <code>computeH</code> and <code>warpImage</code>. By 
-                    manually handling homography computations and image warping, I gained a deeper understanding 
-                    of image alignment and transformation techniques, which enhances my post-processing workflows.</p>
-                
-                <p>As someone doing freelance photography as a hobby, these skills have helped give me a way to 
-                    capture and present expansive landscapes and immersive scenes in a different way. 
-                    Understanding the mechanics behind image stitching allows me to achieve precise alignment 
-                    and seamless blending in my photography, enriching the visual quality of my hobbyist 
-                    projects and expanding my creative capabilities. It's been lots of fun.</p>
+                    manually handling homography computations and image warping, the implementation provides 
+                    a deeper understanding of image alignment and transformation techniques.</p>
             </section>
             
-            <!-- part b: feature matching -->
+            <!-- automated feature matching -->
             <section class="section">
-                <h2>Part B: Feature Matching for Autostitching</h2>
-            </section>
-
-            <!-- part b: steps -->
-            <section class="section">
-                <h2>Step-by-Step Process for Part B</h2>
+                <h2>Automated Feature Detection</h2>
                 
                 <!-- overview -->
                 <section class="section">
                     <h3>Overview of Major Functions and Configurations</h3>
-                    <p>In Part B, the focus shifts to automating the panorama creation process through feature matching and homography computation. 
+                    <p>The implementation extends to automating the panorama creation process through feature matching and homography computation. 
                         The following major functions and configurations were implemented:</p>
                     
                     <ul>
@@ -409,8 +396,8 @@
                 <section class="section">
                     <h3>5. Producing a Mosaic</h3>
                     <p>Using the computed homographies, I warped and blended images to produce automatic mosaics. 
-                        This step is essentially the same as with Part A (warping, panorama size computation, etc.) but utliizes the new values
-                    that we have attained through 4B. </p>
+                        This step follows the same process as manual warping (warping, panorama size computation, etc.) but utilizes the new values
+                    that were computed through automated feature matching. </p>
                     
 
                     Below are examples of the three configuration settings working on a single set of images:
@@ -430,7 +417,7 @@
                         </div>
                         <div class="image-container">
                             <img src="../data/for site/success 2/final_mosaic_part_A.png">
-                            <p class="description">Final Mosaic Part A Example</p>
+                            <p class="description">Final Mosaic Example</p>
                         </div>
                     </div>
                 </section>
@@ -438,7 +425,7 @@
             
             <!-- part b: additional examples -->
             <section class="section">
-                <h2>Part B: Additional Examples</h2>
+                <h2>Additional Examples</h2>
                 <p>To further demonstrate the effectiveness of the automatic stitching process, here are two additional mosaics created using different configurations and image sets:</p>
                 
                 <!-- gallery -->
@@ -475,10 +462,10 @@
                 </div>
             </section>
             
-            <!-- conclusion part b -->
+            <!-- conclusion -->
             <section class="section">
-                <h2>Takeaways for Part B</h2>
-                <p>Feature matching in Part B was particularly interesting to me as it demonstrated 
+                <h2>Discussion</h2>
+                <p>Feature matching was particularly interesting as it demonstrated 
                     the precision and effectiveness of algorithms in aligning images seamlessly. 
                     By implementing automatic feature matching and homography computation, 
                     the process showcased how computer vision techniques can accurately 

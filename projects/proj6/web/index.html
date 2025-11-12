@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180: Project - HDR and Tone Mapping</title>
+    <meta name="description" content="High Dynamic Range imaging and tone mapping techniques for reconstructing HDR radiance maps from multiple exposures.">
+    <meta name="keywords" content="computer vision, HDR, tone mapping, radiance map, Python, image processing">
+    <title>High Dynamic Range Imaging - Adriel Vijuan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,17 +14,17 @@
 </head>
 <body>
     <header>
-        <h1>CS180: HDR and Tone Mapping</h1>
+        <h1>High Dynamic Range Imaging</h1>
         <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-        <h3><a href="../../../index.html">by Adriel Vijuan</a></h3>
-        <h3>Exploring Part A and Part B</h3>
+        <p class="author-link"><a href="../../../index.html">Adriel Vijuan</a></p>
+        <p>HDR reconstruction and tone mapping from multiple exposures</p>
     </header>
 
     <main id="main-content">
         <!-- Introduction -->
         <section class="section">
             <h2>Introduction</h2>
-            <p>This project focuses on High Dynamic Range (HDR) imaging and tone mapping techniques. The objective is to create HDR images by combining multiple Low Dynamic Range (LDR) exposures, reconstructing an HDR radiance map, and applying tone mapping operators to produce visually appealing images suitable for display.</p>
+            <p>This work implements High Dynamic Range (HDR) imaging and tone mapping techniques. The implementation creates HDR images by combining multiple Low Dynamic Range (LDR) exposures, reconstructing an HDR radiance map, and applying tone mapping operators to produce visually appealing images suitable for display.</p>
             <div class="image-gallery">
                 <div>
                     <img src="../data/images/lolm_1.jpg" alt="Original Image">
@@ -31,10 +33,10 @@
             </div>
         </section>
 
-        <!-- Project Goals -->
+        <!-- Objectives -->
         <section class="section">
-            <h2>Project Goals</h2>
-            <p>The primary goal of this project is to develop a robust HDR imaging pipeline that effectively combines multiple exposures to capture the full dynamic range of a scene. The specific objectives include:</p>
+            <h2>Objectives</h2>
+            <p>This work implements a robust HDR imaging pipeline that effectively combines multiple exposures to capture the full dynamic range of a scene. The implementation includes:</p>
             <ul>
                 <li>Recovering the camera response curve <code>g(Z)</code> to accurately map pixel values to log exposures.</li>
                 <li>Constructing a stable HDR radiance map by combining multiple exposures.</li>

@@ -1,5 +1,5 @@
 /* ============================================
-   CS180 Projects - Consolidated Stylesheet
+   Portfolio Stylesheet
    ============================================ */
 
 /* ============================================
@@ -459,6 +459,28 @@ img:focus {
     color: var(--text-secondary);
     text-align: center;
     font-size: 0.95em;
+}
+
+.author-link {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.author-link a {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.author-link a:hover {
+    color: var(--accent-color);
+}
+
+.technical-detail {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    font-style: italic;
 }
 
 /* ============================================

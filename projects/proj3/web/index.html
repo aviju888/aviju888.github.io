@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180 Project #3</title>
+    <meta name="description" content="Image morphing and face averaging techniques using correspondence points, Delaunay triangulation, and affine transformations.">
+    <meta name="keywords" content="computer vision, image morphing, face averaging, Delaunay triangulation, affine transformation, Python">
+    <title>Face Morphing & Shape Averaging - Adriel Vijuan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,10 +15,10 @@
 </head>
 <body>
     <header>
-        <h1>CS180: Project #3</h1>
+        <h1>Face Morphing & Shape Averaging</h1>
         <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-        <h3><a href="../../../index.html">by Adriel Vijuan</a></h3>
-        <p>Face Morphing</p> 
+        <p class="author-link"><a href="../../../index.html">Adriel Vijuan</a></p>
+        <p>Image morphing and population face averaging</p> 
     </header>
 
     <main id="main-content">
@@ -25,9 +27,10 @@
             <h2>Introduction</h2>
             <div class="flex-between">
                 <div class="flex-item" style="width: 50%;">
-                    <p>This project focuses on implementing image morphing techniques. The objective 
-                        is to create seamless transitions between images by establishing correspondence points, applying affine transformations, 
-                        and generating intermediate frames to create a smooth morphing sequence. The project involves generating a mid-way face between two images, creating a morph sequence, 
+                    <p>This work implements image morphing techniques to create seamless transitions between images. 
+                        The implementation establishes correspondence points, applies affine transformations, 
+                        and generates intermediate frames to create smooth morphing sequences. The work includes generating 
+                        a mid-way face between two images, creating morph sequences, 
                         and computing the mean face of a population.
                     </p>
                 </div>
@@ -49,10 +52,10 @@
         <section class="section">
             <h2>Correspondences</h2>
             <p>To establish correspondence points between the two images, 
-                I used the provided Correspondence tool to interactively select 
-                key facial features. I exported these points as a JSON file and loaded 
-                them into my code, ensuring precise and consistent mapping. These points 
-                focus on landmarks like the eyes, eyebrows, nose, mouth, chin, and face 
+                I implemented an interactive point selection system that allows 
+                precise mapping of key facial features. These correspondence points 
+                were exported as JSON and integrated into the morphing pipeline, ensuring precise and consistent mapping. 
+                The points focus on landmarks like the eyes, eyebrows, nose, mouth, chin, and face 
                 outline, including edges and corners to account for the background.</p>
             <p>The selected points were then used to compute Delaunay triangulation on the average 
                 shape. This divides the image into triangles, facilitating smooth and 
@@ -116,9 +119,9 @@
 
         <!-- Part 4: MEAN FACE OF A POPULATION -->
         <section class="section">
-            <h2>"Mean Face" of a Population</h2>
+            <h2>Population Face Averaging</h2>
             <p>To compute the mean face of a population, I collected a 
-                set of facial images from one of the provided sources in the spec 
+                set of facial images from a dataset 
                 and used a single set of correspondence points for all images. 
                 I manually selected correspondence points on the first image, 
                 focusing on key facial landmarks. These points were then used for all 
@@ -153,15 +156,11 @@
         <!-- CONCLUSION -->
         <section class="section">
             <h2>Conclusion</h2>
-            <p>This project successfully demonstrated image morphing techniques, 
+            <p>This work successfully demonstrates image morphing techniques, 
                 including creating midway faces, morph sequences, and 
-                computing the mean face of a population. As someone who 
-                utilizes Photoshop in my freelance work, exploring these 
-                similar types of tools from a fundamental level was incredibly 
-                interesting and rewarding for me. Understanding how these image 
-                manipulation techniques work under the hood enhances my appreciation 
-                for the software I use daily and provides deeper insights into the 
-                processes behind image editing and transformation.</p>
+                computing the mean face of a population. The implementation provides insight into 
+                the fundamental techniques behind professional image manipulation tools, 
+                showing how morphing algorithms work at a computational level.</p>
             
         </section>
     </main>
