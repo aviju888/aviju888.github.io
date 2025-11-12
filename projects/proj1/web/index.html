@@ -21,35 +21,26 @@
     </header>
 
     <main id="main-content">
-        <!-- PROJECT OVERVIEW -->
-        <section class="section flex-row-start">
-            <div class="flex-item mr-20">
-                <h2>Overview</h2>
-                <p>Historical black-and-white photographs often contain valuable color information encoded in separate RGB channel exposures. 
-                    This work implements an automated pipeline for aligning and combining these channels to reconstruct full-color images from 
-                    the Prokudin-Gorskii collection, using multi-scale alignment techniques to handle images of varying sizes.</p>
-                <!-- <ul>
-                    <li><strong>Normalization:</strong> Normalizing pixel values to a common scale for consistency.</li>
-                    <li><strong>Splitting:</strong> Dividing each image into RGB channels.</li>
-                    <li><strong>Alignment:</strong> Aligning RGB channels using simple or pyramid-based methods for accuracy and efficiency.</li>
-                    <li><strong>White Balancing:</strong> Correcting color imbalances to achieve realistic color representation.</li>
-                </ul> -->
-            </div>
-
-            <div class="flex-auto">
-                <img src="../data/cathedral.jpg" alt="Cathedral" class="img-small">
-            </div>
-            <div class="flex-auto"></div>
-                <img src="../data/monastery.jpg" alt="Cathedral" class="img-small">
-            </div>
-            <div class="flex-auto"></div>
-                <img src="../data/tobolsk.jpg" alt="Cathedral" class="img-small">
+        <section>
+            <h2>Overview</h2>
+            <p>Historical black-and-white photographs often contain valuable color information encoded in separate RGB channel exposures. 
+                This work implements an automated pipeline for aligning and combining these channels to reconstruct full-color images from 
+                the Prokudin-Gorskii collection, using multi-scale alignment techniques to handle images of varying sizes.</p>
+            
+            <div class="image-gallery" style="margin-top: var(--space-md);">
+                <div class="image-container">
+                    <img src="../data/cathedral.jpg" alt="Cathedral">
+                </div>
+                <div class="image-container">
+                    <img src="../data/monastery.jpg" alt="Monastery">
+                </div>
+                <div class="image-container">
+                    <img src="../data/tobolsk.jpg" alt="Tobolsk">
+                </div>
             </div>
         </section>
 
-        
-        <!-- APPROACH BREAKDOWN -->
-        <section class="section">
+        <section>
             <h2>Methodology</h2>
             
             <h3>Implementation Details</h3>
@@ -105,8 +96,7 @@
         </section>
 
 
-        <!-- RESULTS -->
-        <section class="section">
+        <section>
             <h2>Results</h2>
             <p>Results from the dataset:</p>
             
@@ -115,8 +105,6 @@
             </div>
         </section>
 
-        <!-- For loading images -->
-        
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const gallery = document.getElementById('gallery');
@@ -159,53 +147,43 @@
             });
         </script>
 
-        <!-- CSS for Grid -->
-        
 
-        <!-- COMMENTARY -->
-<section class="section flex-row-start">
-    <div class="flex-item mr-20">
-        <h2>Additional Features</h2>
-        
-        <p><strong>White Balance:</strong> A white balance function was implemented to correct color 
-            imbalances in the images, improving overall image quality. The function, <code>white_balance_white</code>, 
-            assumes that the brightest pixel in the image represents white, scaling color channels accordingly.</p>
+        <section>
+            <h2>Additional Features</h2>
+            
+            <p><strong>White Balance:</strong> A white balance function was implemented to correct color 
+                imbalances in the images, improving overall image quality. The function, <code>white_balance_white</code>, 
+                assumes that the brightest pixel in the image represents white, scaling color channels accordingly.</p>
 
-        <ul>
-            <li>The function determines the maximum intensity values for each color channel (red, green, 
-                blue) in the image.</li>
-            <li>It calculates scaling factors by finding the inverse of these maximum values. This helps ensure that the 
-                brightest pixel in each channel is scaled to white.</li>
-            <li>These scaling factors are applied to the respective color channels to adjust the intensities. The 
-                image values are then clipped to ensure they stay within the valid range [0, 1].</li>
-        </ul>
-    </div>
+            <ul>
+                <li>The function determines the maximum intensity values for each color channel (red, green, 
+                    blue) in the image.</li>
+                <li>It calculates scaling factors by finding the inverse of these maximum values. This helps ensure that the 
+                    brightest pixel in each channel is scaled to white.</li>
+                <li>These scaling factors are applied to the respective color channels to adjust the intensities. The 
+                    image values are then clipped to ensure they stay within the valid range [0, 1].</li>
+            </ul>
 
-    <!-- Image container -->
-    <div class="flex-auto flex-col-center">
-        <div>
-            <p><strong>Before:</strong></p>
-            <img src="../output/icon-messed-up.jpg" alt="Cathedral Before" class="img-medium mb-10">
-        </div>
-        <div>
-            <p><strong>After:</strong></p>
-            <img src="../output/icon.jpg" alt="Cathedral After" class="img-medium">
-        </div>
-    </div>
-</section>
+            <div class="image-gallery" style="margin-top: var(--space-md);">
+                <div class="image-container">
+                    <img src="../output/icon-messed-up.jpg" alt="Before white balance">
+                    <p class="description">Before</p>
+                </div>
+                <div class="image-container">
+                    <img src="../output/icon.jpg" alt="After white balance">
+                    <p class="description">After</p>
+                </div>
+            </div>
+        </section>
 
-        
-        <!-- CUSTOM RESULTS -->
-        <section class="section">
-        <h2>Additional Examples</h2>
-        <p>Additional colorization results:</p>
+        <section>
+            <h2>Additional Examples</h2>
+            <p>Additional colorization results:</p>
             
             <div class="image-gallery" id="custom-gallery">
                 <!-- Images will be dynamically added here -->
             </div>
         </section>
-
-        <!-- For loading images -->
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
@@ -238,9 +216,8 @@
             });
         </script>
 
-    <!-- DISCUSSION -->
-    <section class="section">
-        <h2>Discussion</h2>
+        <section>
+            <h2>Discussion</h2>
         
         <p>While many images have been successfully colorized, some show misalignment issues that need to be addressed. 
             For instance, discrepancies in alignment can be observed due to the scoring mechanism used, which did not 
@@ -251,9 +228,7 @@
             patterns and textures in the outfit of the subject cause the displacement vectors to shift slightly, 
             resulting in a misalignment of the color layers. This issue arises, as I believe, due to the fact that 
             the alignment algorithm struggles with contrasting patterns, which complicates achieving precise alignment.</p>
-        
-    </section>
-
+        </section>
     </main>
 </body>
 </html>
